@@ -78,7 +78,7 @@ class AppFixtures extends Fixture
         for($i = 0; $i < 5;$i++) {
             $product = new Product();
             $randomCategory = array_rand($tableauCategory, 1);
-            $randomShop = array_rand($tableauShops, 1);
+            $randomShp = array_rand($tableauShops, 1);
             $product->setPrice($this->faker->word())
                 ->setStatus(true);
 

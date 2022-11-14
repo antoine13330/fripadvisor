@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Entity\Category;
+use App\Entity\Shop;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -43,7 +45,7 @@ class ProductController extends AbstractController
     #[Route('/api/product/{idProduct}', name: 'products.getproduct', methods: ['GET'])]
     #[ParamConverter("product", options: ["id" => "idProduct"], class: 'App\Entity\Product')]
     public function getProduct(
-        product $product,
+        Product $product,
         Request $request,
         SerializerInterface $serializer
     ) :JsonResponse
@@ -54,7 +56,7 @@ class ProductController extends AbstractController
     #[Route('/api/product/{idProduct}', name: 'products.deleteProduct', methods: ['DELETE'])]
     #[ParamConverter("product", options: ["id" => "idProduct"], class: 'App\Entity\product')]
     public function deleteProduct(
-        product $product,
+        Product $product,
         EntityManagerInterface $entityManager
     ) :JsonResponse
     {
@@ -121,5 +123,33 @@ class ProductController extends AbstractController
         $location = $urlGenerator->generate("products.getProduct", ['idProduct' => $product->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
         $jsonproduct = $serializer->serialize($product, "json", ['groups' => 'getProduct']);
         return new JsonResponse($jsonproduct, Response::HTTP_CREATED, ["Location" => $location], true);
+    }
+
+    #[Route('/api/products/shop/{shop}', name: 'products.getproductbyshop', methods: ['GET'])]
+    #[ParamConverter("shop", options: ["id" => "shop"], class: 'App\Entity\Product')]
+    public function getProductByShop(
+        Shop $shop,
+        ProductRepository $repository,
+        Request $request,
+    ) :JsonResponse
+    {
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 5);
+        $limit = $limit > 20 ? 20 : $limit;
+        return $this->json($repository->findProductsByShop($page, $limit, $shop->getId()), 200, [], ['groups' => 'getAllShops']);
+    }
+
+    #[Route('/api/products/category/{category}', name: 'products.getproductbycategory', methods: ['GET'])]
+    #[ParamConverter("category", options: ["id" => "category"], class: 'App\Entity\Product')]
+    public function getProductByCategory(
+        Category $category,
+        ProductRepository $repository,
+        Request $request,
+    ) :JsonResponse
+    {
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 5);
+        $limit = $limit > 20 ? 20 : $limit;
+        return $this->json($repository->findProductsByCategory($page, $limit, $category->getId()), 200, [], ['groups' => 'getAllShops']);
     }
 }

@@ -16,6 +16,8 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class ShopController extends AbstractController
 {
@@ -32,12 +34,24 @@ class ShopController extends AbstractController
     public function getAllShops(
         ShopRepository $repository,
         Request $request,
+        SerializerInterface $serializer,
+        TagAwareCacheInterface $cache
     ) :JsonResponse
     {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 5);
-        $limit = $limit > 20 ? 20 : $limit;
-        return $this->json($repository->findShops($page, $limit), 200, [], ['groups' => 'getAllShops']);
+        //$page = $request->get('page', 1);
+        //$limit = $request->get('limit', 5);
+        //$limit = $limit > 20 ? 20 : $limit;
+        //return $this->json($repository->findShops($page, $limit), 200, [], ['groups' => 'getAllShops']);
+        //
+
+        $idCache = 'getAllShops';
+        $shops = $cache->get($idCache, function (ItemInterface $item) use ($repository) {
+            $item->tag("shopCache");
+            return $repository->findAll();
+        });
+
+        $jsonShops = $serializer->serialize($shops, 'json', ['groups' => 'getAllShops']);
+        return new JsonResponse($jsonShops, Response::HTTP_OK, [], true);
     }
 
     #[Route('/api/shop/{idShop}', name: 'shops.getShop', methods: ['GET'])]

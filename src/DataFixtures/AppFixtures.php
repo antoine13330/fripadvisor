@@ -10,6 +10,8 @@ use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Generator;
 use Faker\Factory;
+use App\Repository\ShopRepository;
+use App\Repository\CategoryRepository;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 
@@ -26,7 +28,7 @@ class AppFixtures extends Fixture
      */
     private UserPasswordHasherInterface $userPasswordHasher;
 
-    public function __construct(UserPasswordHasherInterface $userPasswordHasher) {
+    public function __construct(UserPasswordHasherInterface $userPasswordHasher, ShopRepository $shopRepository, CategoryRepository $categoryRepository) {
         $this->faker = Factory::create("fr_FR");
         $this->userPasswordHasher = $userPasswordHasher;
     }
@@ -46,46 +48,46 @@ class AppFixtures extends Fixture
             $userUser = new User();
             $password = $this->faker->password(2, 6);
             $userUser->setUsername($this->faker->userName() . '@' . $password)
-            ->setRoles(["ROLE_USER"])
-            ->setPassword($this->userPasswordHasher->hashPassword($userUser, $password));
+                ->setRoles(["ROLE_USER"])
+                ->setPassword($this->userPasswordHasher->hashPassword($userUser, $password));
             $manager->persist($userUser);
         }
 
-        $tableauShops = [];
-
+        //shops
         for($i = 0; $i < 5;$i++) {
             $shop = new Shop();
-            $tableauShops[] = $shop;
+
             $shop->setName($this->faker->company())
                 ->setPoastalCode($this->faker->streetAddress())
                 ->setLocation($this->faker->streetAddress())
                 ->setSatus(true);
 
             $manager->persist($shop);
+
+            //categories
+            for($j = 0; $j < 5;$j++) {
+                $category = new Category();
+                $category->setName($this->faker->word())
+                    ->setType($this->faker->word())
+                    ->setStatus(true);
+
+                $manager->persist($category);
+
+                //products
+                for($k = 0; $k < 5;$k++) {
+                    $product = new Product();
+
+                    $product->setName($this->faker->word())
+                        ->setPrice($this->faker->numberBetween(5, 200))
+                        ->setSize($this->faker->numberBetween(20, 50))
+                        ->setStock($this->faker->numberBetween(0, 100))
+                        ->setIdShop($shop)
+                        ->addIdCategory($category)
+                        ->setStatus(true);
+                    $manager->persist($product);
+                }
+            }
+            $manager->flush();
         }
-
-        $tableauCategory = [];
-
-        for($i = 0; $i < 5;$i++) {
-            $category = new Category();
-            $category->setName($this->faker->word())
-                ->setStatus(true);
-
-            $manager->persist($category);
-            $tableauCategory[] = $category;
-        }
-
-        for($i = 0; $i < 5;$i++) {
-            $product = new Product();
-            $randomCategory = array_rand($tableauCategory, 1);
-            $randomShop = array_rand($tableauShops, 1);
-            $product->setPrice($this->faker->word())
-                ->setStatus(true);
-
-            $manager->persist($product);
-
-        }
-
-        $manager->flush();
     }
 }

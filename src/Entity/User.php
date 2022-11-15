@@ -15,25 +15,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[Assert\NotBlank(message: "Un utilisateur doit avoir un nom")]
-    #[Assert\NotNull(message: "Un utilisateur doit avoir un nom")]
-    #[Assert\Length(min: 3, minMessage: "Le nom de l'utilisateur doit faire plus de {{ limit }} lettres")]
-
     #[ORM\Column(length: 180, unique: true)]
     private ?string $username = null;
 
     #[ORM\Column]
-    #[Assert\NotBlank(message: "Un utilisateur doit avoir un role")]
-    #[Assert\NotNull(message: "Un utilisateur doit avoir au moins un role")]
+ 
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Assert\NotBlank(message: "Un utilisateur doit avoir un mot de passe")]
-    #[Assert\NotNull(message: "Un utilisateur doit avoir un mot de passe non null")]
-    #[Assert\Length(min: 3, minMessage: "Le mdp de l'utilisateur doit faire plus de {{ limit }} lettres")]
     private ?string $password = null;
 
     public function getId(): ?int

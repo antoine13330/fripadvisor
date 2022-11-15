@@ -49,9 +49,10 @@ class ShopController extends AbstractController
         $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer) {
             echo "MISE EN CACHE";
             $item->tag('ShopCache');
+            $context = SerializationContext::create()->setGroups(["getAllShops"]);
 
             $shop = $repository->findAll();
-            return $serializer->serialize($shop, 'json', ['groups' => 'getAllShops']);
+            return $serializer->serialize($shop, 'json', $context);
 
         } );
         return new JsonResponse($jsonShop, 200, [], true);
@@ -116,13 +117,10 @@ class ShopController extends AbstractController
             $request->getContent(),
             Shop::class,
             'json');
-        $shop->setName($updateShop->getName() ? $updateShop->getName() : $updateShop->getName());
+        $shop->setName($updateShop->getName() ? $updateShop->getName() : $shop->getName());
         $shop->setPoastalCode($updateShop->getPoastalCode() ? $updateShop->getPoastalCode() : $updateShop->getType());
 
         $shop->setSatus("1");
-
-        //$content = $request->toArray();
-        //$idCategorie = $content["idCategorie"];
 
         $erors = $validator->validate($shop);
         if ($erors->count() >0) {
@@ -132,8 +130,10 @@ class ShopController extends AbstractController
         $entityManager->persist($shop);
         $entityManager->flush();
 
+        $context = SerializationContext::create()->setGroups(["getShop"]);
+
         $location = $urlGenerator->generate("shops.getShop", ['idShop' => $shop->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
-        $jsonShop = $serializer->serialize($shop, 'json', ['groups' => 'getShop']);
+        $jsonShop = $serializer->serialize($shop, 'json', $context);
         return new JsonResponse($jsonShop, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
@@ -151,7 +151,6 @@ class ShopController extends AbstractController
              $request->getContent(),
              Shop::class,
              'json',
-             [AbstractNormalizer::OBJECT_TO_POPULATE => $Shop]
          );
          $Shop->setSatus("1");
 
@@ -162,39 +161,9 @@ class ShopController extends AbstractController
          $entityManager->flush();
 
          $location = $urlGenerator->generate("shops.getShop", ['idShop' => $Shop->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+         $context = SerializationContext::create()->setGroups(["getAllShops"]);
 
-         $jsonBoutique = $serializer->serialize($Shop, 'json', ['groups' => 'getAllShops']);
-         return new JsonResponse($jsonBoutique, JsonResponse::HTTP_CREATED, ['$location' => ''], true);
+         $jsonBoutique = $serializer->serialize($Shop, 'json', $context);
+         return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, ['$location' => ''], true);
      }
-
-    // #[Route('/api/shop/{id}', name: 'shops.updateShop', methods: ['PATCH'])]
-    // #[ParamConverter("shop", options: ["id" => "idShop"], class: 'App\Entity\Shop')]
-    // public function updateShop(
-    //     Shop $shop,
-    //     Request $request,
-    //     EntityManagerInterface $entityManager,
-    //     SerializerInterface $serializer,
-    //     UrlGeneratorInterface $urlGenerator,
-    //     ValidatorInterface $validator,
-    // ) :JsonResponse
-    // {
-    //     $shop = $serializer->deserialize($request->getContent(), Shop::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $shop]);
-    //     $shop->setStatus(true);
-
-    //     $content = $request->toArray();
-    //     //$idBoutique = $content['idBoutique'];
-    //     //$shop->addBoutiqueCategorie($categorieRepository->find($idBoutique));
-
-    //     $erors = $validator->validate($shop);
-    //     if ($erors->count() >0) {
-    //         return new JsonResponse($serializer->serialize($erors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
-    //     }
-
-    //     $entityManager->persist($shop);
-    //     $entityManager->flush();
-
-    //     $location = $urlGenerator->generate("shops.getBoutique", ['idShop' => $shop->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
-    //     $jsonShop = $serializer->serialize($shop, "json", ['groups' => 'getShop']);
-    //     return new JsonResponse($jsonShop, Response::HTTP_CREATED, ["Location" => $location], true);
-    // }
 }

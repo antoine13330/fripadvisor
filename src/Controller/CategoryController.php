@@ -36,8 +36,8 @@ class CategoryController extends AbstractController
         ]);
     }
 
-    #[Route('/api/categorys', name: 'categorys.getAll', methods: ['GET'])]
-    public function getAllcategorys(
+    #[Route('/api/categories', name: 'categories.getAll', methods: ['GET'])]
+    public function getAllcategories(
         CategoryRepository $repository,
         SerializerInterface $serializer,
         Request $request,
@@ -47,10 +47,10 @@ class CategoryController extends AbstractController
         $page = $request->get('page', 1);
         $limit = $request->get('limit', 5);
         $limit = $limit > 20 ? 20 : $limit;
-        // return $this->json($repository->findCategories($page, $limit), 200, [], ['groups' => 'getAllcategorys']);
+        // return $this->json($repository->findCategories($page, $limit), 200, [], ['groups' => 'getAllCategories']);
 
-        $idCache = 'getAllCategorys';
-        $context = SerializationContext::create()->setGroups(["getAllCategorys"]);
+        $idCache = 'getAllCategories';
+        $context = SerializationContext::create()->setGroups(["getAllCategories"]);
 
         $jsonCategory = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $context) {
             echo "MISE EN CACHE";
@@ -58,13 +58,13 @@ class CategoryController extends AbstractController
 
 
             $category = $repository->findAll();
-        return $serializer->serialize($category, 'json', $context /*['groups' => 'getAllCategorys']*/);
+        return $serializer->serialize($category, 'json', $context);
 
         } );
         return new JsonResponse($jsonCategory, 200, [], true);
     }
 
-    #[Route('/api/category/{idCategory}', name: 'categorys.getCategory', methods: ['GET'])]
+    #[Route('/api/category/{idCategory}', name: 'categories.getCategory', methods: ['GET'])]
     #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\Category')]
     public function getCategory(
         Category $category,
@@ -86,7 +86,7 @@ class CategoryController extends AbstractController
         return new JsonResponse($jsonCategory, Response::HTTP_OK, [], true);
     }
 
-    #[Route('/api/category/{idCategory}', name: 'categorys.deleteCategory', methods: ['DELETE'])]
+    #[Route('/api/category/{idCategory}', name: 'categories.deleteCategory', methods: ['DELETE'])]
     #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\category')]
     public function deleteCategory(
         Category $category,
@@ -128,7 +128,7 @@ class CategoryController extends AbstractController
         $entityManager->persist($category);
         $entityManager->flush();
 
-        $location = $urlGenerator->generate("categorys.getCategory", ['idCategory' => $category->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
+        $location = $urlGenerator->generate("categories.getCategory", ['idCategory' => $category->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
         $jsonCategory = $serializer->serialize($category, 'json', ['groups' => 'getCategory']);
         return new JsonResponse($jsonCategory, Response::HTTP_CREATED, ["Location" => $location], true);
     }
@@ -168,11 +168,11 @@ class CategoryController extends AbstractController
         $entityManager->persist($Category);
         $entityManager->flush();
 
-        $location = $urlGenerator->generate("categorys.getCategory", ['idCategory' => $Category->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGenerator->generate("categories.getCategory", ['idCategory' => $Category->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $context = SerializationContext::create()->setGroups(["getAllCategorys"]);
+        $context = SerializationContext::create()->setGroups(["getAllCategories"]);
 
-        $jsonBoutique = $serializer->serialize($Category, 'json', $context /*['groups' => 'getAllCategorys']*/);
+        $jsonBoutique = $serializer->serialize($Category, 'json', $context /*['groups' => 'getAllCategories']*/);
         return new JsonResponse($jsonBoutique, JsonResponse::HTTP_CREATED, ['$location' => ''], true);
     }
 }

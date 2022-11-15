@@ -65,7 +65,7 @@ class ShopRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-     /**
+    /**
      * Retourne les boutiques actives, paginées par $page à la $limite
      * @param int $page
      * @param int $limit limite de boutiques par page

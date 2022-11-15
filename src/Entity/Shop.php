@@ -26,9 +26,11 @@ class Shop
     private ?string $name = null;
 
     #[ORM\Column(length: 5)]
+    #[Groups(['getShop', 'getAllShops'])]
     private ?string $poastalCode = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['getShop', 'getAllShops'])]
     private ?string $location = null;
 
     #[ORM\Column(length: 1)]

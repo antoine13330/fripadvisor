@@ -15,14 +15,14 @@ use Hateoas\Configuration\Annotation as Hateoas;
  * @Hateoas\Relation(
  *      "self",
  *      href=@Hateoas\Route(
- *      "categorys.getAll",
+ *      "categories.getAll",
  *      parameters={
  *      "idCategory" = "expr(object.getId())"
  *       }
  *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getAllCategorys")
+ *      exclusion = @Hateoas\Exclusion(groups="getAllCategories")
  * )
- * 
+ *
  */
 
 #[ORM\Entity(repositoryClass: CategoryRepository::class)]
@@ -31,15 +31,15 @@ class Category
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getCategory', 'getAllCategorys'])]
+    #[Groups(['getCategory', 'getAllCategories'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getCategory', 'getAllCategorys'])]
+    #[Groups(['getCategory', 'getAllCategories'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getCategory', 'getAllCategorys'])]
+    #[Groups(['getCategory', 'getAllCategories'])]
     private ?string $type = null;
 
     #[ORM\Column(length: 1)]

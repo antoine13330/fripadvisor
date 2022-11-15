@@ -69,11 +69,10 @@ class ShopRepository extends ServiceEntityRepository
      * Retourne les boutiques actives, paginées par $page à la $limite
      * @param int $page
      * @param int $limit limite de boutiques par page
-     * @return Request
      */
-    public function findShops(int $page, int $limit): Request {
+    public function findShops(int $page, int $limit) {
         $qb = $this->createQueryBuilder('s');
-        $qb->where($qb->expr()->eq('s.status', true))
+        $qb->where($qb->expr()->eq('s.satus', "1"))
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
         return $qb->getQuery()->getResult();

@@ -43,6 +43,7 @@ class Product
     private ?string $status = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'relation')]
+    #[Groups(['getShop', 'getAllShops'])]
     private Collection $idCategory;
 
     public function __construct()

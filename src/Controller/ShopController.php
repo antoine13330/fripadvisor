@@ -88,7 +88,7 @@ class ShopController extends AbstractController
     ) :JsonResponse
     {
         $shop = $serializer->deserialize($request->getContent(), Shop::class, 'json');
-        $shop->setStatus(true);
+        $shop->setSatus("1");
 
         //$content = $request->toArray();
         //$idCategorie = $content["idCategorie"];

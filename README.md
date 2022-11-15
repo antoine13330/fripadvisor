@@ -15,7 +15,7 @@ JWT TOKEN CONFIGURATION :
 - open git bash at project's root
 - enter ```openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096``` ( enter 2 times your passphrase ).
 - get the key and generate public key ```openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout``` ( reenter the passphrase ) 
-- in .env.local  set ```JWT_PASSPHRASE=password```
+- in .env.local  set ```JWT_PASSPHRASE=PASSWORD``` password corresponding to the entered passphrase.
 
 Now to get the JWT_TOKEN ( to insert in the authorization of HTTP Request ) , use <http://127.0.0.1:8000/api/login_check>.
 

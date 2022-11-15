@@ -66,48 +66,14 @@ class ProductRepository extends ServiceEntityRepository
 //    }
 
     /**
-     * Retourne les produits actifs, paginées par $page à la $limite
+     * Retourne les produits actives, paginées par $page à la $limite
      * @param int $page
      * @param int $limit limite de produits par page
      * @return Request
      */
     public function findProducts(int $page, int $limit): Request {
-        $qb = $this->createQueryBuilder('p');
-        $qb->where($qb->expr()->eq('p.status', true))
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit);
-        return $qb->getQuery()->getResult();
-    }
-
-    /**
-     * Retourne les produits actifs selon leur shop, paginées par $page à la $limite
-     * @param int $page
-     * @param int $limit limite de produits par page
-     * @param int $shopId id du shop
-     * @return Request
-     */
-    public function findProductsByShop(int $page, int $limit, int $shopId): Request {
-        $qb = $this->createQueryBuilder('p');
-        $qb->innerJoin('p.isShop', 's')
-            ->where($qb->expr()->eq('p.status', true))
-            ->andWhere($qb->expr()->eq('s.id', $shopId))
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit);
-        return $qb->getQuery()->getResult();
-    }
-
-    /**
-     * Retourne les produits actifs selon leur shop, paginées par $page à la $limite
-     * @param int $page
-     * @param int $limit limite de produits par page
-     * @param int $categoryId id de la category
-     * @return Request
-     */
-    public function findProductsByCategory(int $page, int $limit, int $categoryId): Request {
-        $qb = $this->createQueryBuilder('p');
-        $qb->innerJoin('p.categoryProduct', 'cp')
-            ->where($qb->expr()->eq('p.status', true))
-            ->andWhere($qb->expr()->eq('cp.id', $categoryId))
+        $qb = $this->createQueryBuilder('P');
+        $qb->where($qb->expr()->eq('P.status', true))
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
         return $qb->getQuery()->getResult();

@@ -40,7 +40,7 @@ class Picture
 
     /**
      * @var File|null
-     * @Vich\UploadableField(mapping="pictures", fileNameProperty="realPath")
+     * @Vich\UploadableField(mapping="Pictures", fileNameProperty="realPath")
      */
     private ?File $file;
 

@@ -2,8 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Category;
-use App\Entity\Shop;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -42,24 +40,25 @@ class ProductController extends AbstractController
         TagAwareCacheInterface $cache
     ) :JsonResponse
     {
-        $idCache = 'getProduct';
+        $page = $request->get('page', 1);
+        $limit = $request->get('limit', 5);
+        $limit = $limit > 20 ? 20 : $limit;
 
-        $jsonProducts = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request) {
-            $page = $request->get('page', 1);
-            $limit = $request->get('limit', 5);
-            $limit = min($limit, 20);
+        $idCache = 'getAllProducts';
+        $jsonProduct = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer) {
+            echo "MISE EN CACHE";
+            $item->tag('ProductCache');
 
-            $item->tag("getProduct");
-            $context = SerializationContext::create()->setGroups('getAllProducts');
+            $product = $repository->findAll();
+            return $serializer->serialize($product, 'json', ['groups' => 'getAllProducts']);
 
-            $shops = $repository->findProducts($page, $limit);
-            return $serializer->serialize($shops, 'json', $context);
-        });
+        } );
+        return new JsonResponse($jsonProduct, 200, [], true);
 
-        return new JsonResponse($jsonProducts, Response::HTTP_OK, [], true);
+        // return $this->json($repository->findProducts($page, $limit), 200, [], ['groups' => 'getAllProducts']);
     }
 
-    #[Route('/api/product/{idProduct}', name: 'products.getproduct', methods: ['GET'])]
+    #[Route('/api/product/{idProduct}', name: 'products.getProduct', methods: ['GET'])]
     #[ParamConverter("product", options: ["id" => "idProduct"], class: 'App\Entity\Product')]
     public function getProduct(
         Product $product,
@@ -85,6 +84,7 @@ class ProductController extends AbstractController
      * @throws \Psr\Cache\InvalidArgumentException
      */
     #[Route('/api/product/{idProduct}', name: 'products.deleteProduct', methods: ['DELETE'])]
+    #[ParamConverter("Product", options: ["id" => "idProduct"], class: 'App\Entity\Product')]
     #[ParamConverter("product", options: ["id" => "idProduct"], class: 'App\Entity\Product')]
     public function deleteProduct(
         Product $product,
@@ -111,9 +111,6 @@ class ProductController extends AbstractController
         $product = $serializer->deserialize($request->getContent(), Product::class, 'json');
         $product->setStatus(true);
 
-        //$content = $request->toArray();
-        //$idCategorie = $content["idCategorie"];
-
         $erors = $validator->validate($product);
         if ($erors->count() >0) {
             return new JsonResponse($serializer->serialize($erors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
@@ -122,67 +119,40 @@ class ProductController extends AbstractController
         $entityManager->persist($product);
         $entityManager->flush();
 
+        $context = SerializationContext::create()->setGroups(["getProduct"]);
+
         $location = $urlGenerator->generate("products.getProduct", ['idProduct' => $product->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
-        $jsonProduct = $serializer->serialize($product, 'json', ['groups' => 'getProduct']);
+        $jsonProduct = $serializer->serialize($product, 'json', $context);
         return new JsonResponse($jsonProduct, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 
-    #[Route('/api/product/{id}', name: 'products.updateProduct', methods: ['PATCH'])]
-    #[ParamConverter("product", options: ["id" => "idProduct"], class: 'App\Entity\product')]
+    // update route
+    #[Route('/api/product/{id}', name: 'Product.update', methods: ['PUT'])]
     public function updateProduct(
-        Product $product,
+        Product $Product,
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
-        UrlGeneratorInterface $urlGenerator,
-        ValidatorInterface $validator,
-    ) :JsonResponse
-    {
-        $product = $serializer->deserialize($request->getContent(), Product::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $product]);
-        $product->setStatus(true);
+        ProductRepository $productRepository,
+        UrlGeneratorInterface $urlGenerator
+    ): JsonResponse {
+        $Product = $serializer->deserialize(
+            $request->getContent(),
+            Product::class,
+            'json',
+        );
+        $Product->setStatus("1");
 
         $content = $request->toArray();
-        //$idBoutique = $content['idBoutique'];
-        //$product->addBoutiqueCategorie($categorieRepository->find($idBoutique));
+        $id = $content['idProduct'];
 
-        $erors = $validator->validate($product);
-        if ($erors->count() >0) {
-            return new JsonResponse($serializer->serialize($erors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
-        }
-
-        $entityManager->persist($product);
+        $entityManager->persist($Product);
         $entityManager->flush();
 
-        $location = $urlGenerator->generate("products.getProduct", ['idProduct' => $product->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
-        $jsonproduct = $serializer->serialize($product, "json", ['groups' => 'getProduct']);
-        return new JsonResponse($jsonproduct, Response::HTTP_CREATED, ["Location" => $location], true);
-    }
+        $location = $urlGenerator->generate("products.getProduct", ['idProduct' => $Product->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $context = SerializationContext::create()->setGroups(["getAllProducts"]);
 
-    #[Route('/api/products/shop/{shop}', name: 'products.getproductbyshop', methods: ['GET'])]
-    #[ParamConverter("shop", options: ["id" => "shop"], class: 'App\Entity\Product')]
-    public function getProductByShop(
-        Shop $shop,
-        ProductRepository $repository,
-        Request $request,
-    ) :JsonResponse
-    {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 5);
-        $limit = $limit > 20 ? 20 : $limit;
-        return $this->json($repository->findProductsByShop($page, $limit, $shop->getId()), 200, [], ['groups' => 'getAllShops']);
-    }
-
-    #[Route('/api/products/category/{category}', name: 'products.getproductbycategory', methods: ['GET'])]
-    #[ParamConverter("category", options: ["id" => "category"], class: 'App\Entity\Product')]
-    public function getProductByCategory(
-        Category $category,
-        ProductRepository $repository,
-        Request $request,
-    ) :JsonResponse
-    {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 5);
-        $limit = $limit > 20 ? 20 : $limit;
-        return $this->json($repository->findProductsByCategory($page, $limit, $category->getId()), 200, [], ['groups' => 'getAllShops']);
+        $jsonBoutique = $serializer->serialize($Product, 'json', $context);
+        return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, ['$location' => ''], true);
     }
 }

@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
@@ -14,28 +15,28 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getShop', 'getAllShops'])]
+    #[Groups(['getProduct', 'getAllProducts'])]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'products')]
+    #[ORM\ManyToOne(inversedBy: 'idProducts')]
+    #[Groups(['getProduct', 'getAllProducts'])]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['getShop', 'getAllShops'])]
     private ?Shop $idShop = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['getShop', 'getAllShops'])]
+    #[Groups(['getProduct', 'getAllProducts'])]
     private ?string $name = null;
 
     #[ORM\Column]
-    #[Groups(['getShop', 'getAllShops'])]
+    #[Groups(['getProduct', 'getAllProducts'])]
     private ?int $price = null;
 
     #[ORM\Column(length: 20)]
-    #[Groups(['getShop', 'getAllShops'])]
+    #[Groups(['getProduct', 'getAllProducts'])]
     private ?string $size = null;
 
     #[ORM\Column]
-    #[Groups(['getShop', 'getAllShops'])]
+    #[Groups(['getProduct', 'getAllProducts'])]
     private ?int $stock = null;
 
     #[ORM\Column(length: 1)]
@@ -55,12 +56,12 @@ class Product
         return $this->id;
     }
 
-    public function getIdShop(): ?shop
+    public function getIdShop(): ?Shop
     {
         return $this->idShop;
     }
 
-    public function setIdShop(?shop $idShop): self
+    public function setIdShop(?Shop $idShop): self
     {
         $this->idShop = $idShop;
 

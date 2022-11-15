@@ -27,10 +27,14 @@ class AppFixtures extends Fixture
      * @var UserPasswordHasherInterface
      */
     private UserPasswordHasherInterface $userPasswordHasher;
+    private ShopRepository $shopRepository;
+    private CategoryRepository $categoryRepository;
 
     public function __construct(UserPasswordHasherInterface $userPasswordHasher, ShopRepository $shopRepository, CategoryRepository $categoryRepository) {
         $this->faker = Factory::create("fr_FR");
         $this->userPasswordHasher = $userPasswordHasher;
+        $this->shopRepository = $shopRepository;
+        $this->categoryRepository = $categoryRepository;
     }
 
     public function load(ObjectManager $manager): void

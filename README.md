@@ -10,6 +10,13 @@ If you didn't already:
  - configure your DATABASE_URL in .env.local file  where ```mysql://DB_USER@127.0.0.1:3306/DB_NAME?serverVersion=14&charset=utf8```. U can set a passphrase to your db.
  - if you want fake datas use in console ```php bin/console doctrine:fixtures:load```
 
+JWT TOKEN CONFIGURATION : 
+- create dir jwt in config
+- open git bash at project's root
+- enter ```openssl genpkey -out config/jwt/private.pem -aes256 -algorithm rsa -pkeyopt rsa_keygen_bits:4096``` ( enter 2 times your passphrase ).
+- get the key and generate public key ```openssl pkey -in config/jwt/private.pem -out config/jwt/public.pem -pubout``` ( reenter the passphrase ) 
+- in .env.local  set ```JWT_PASSPHRASE=password```
+
 Now to get the JWT_TOKEN ( to insert in the authorization of HTTP Request ) , use <http://127.0.0.1:8000/api/login_check>.
 
 You are set up to request our Fripadvisor API. See the Documentation for more infos !

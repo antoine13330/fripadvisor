@@ -136,15 +136,16 @@ class ProductController extends AbstractController
         ProductRepository $productRepository,
         UrlGeneratorInterface $urlGenerator
     ): JsonResponse {
-        $Product = $serializer->deserialize(
+        $updateProduct = $serializer->deserialize(
             $request->getContent(),
             Product::class,
             'json',
         );
+        $product->setName($updateProduct->getName() ? $updateProduct->getName() : $product->getName());
+        $product->setPrice($updateProduct->getPrice() ? $updateProduct->getPrice() : $product->getPrice());
+        $product->setSize($updateProduct->getSize() ? $updateProduct->getSize() : $product->getSize());
+        $product->setStock($updateProduct->getStock() ? $updateProduct->getStock() : $product->getStock());
         $product->setStatus("1");
-
-        $content = $request->toArray();
-        $id = $content['idProduct'];
 
         $entityManager->persist($product);
         $entityManager->flush();

@@ -73,7 +73,7 @@ class CategoryRepository extends ServiceEntityRepository
      */
     public function findCategories(int $page, int $limit) {
         $qb = $this->createQueryBuilder('c');
-        $qb->where($qb->expr()->eq('c.status', true))
+        $qb->where($qb->expr()->eq('c.status', "1"))
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
         return $qb->getQuery()->getResult();

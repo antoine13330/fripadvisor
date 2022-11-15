@@ -39,7 +39,6 @@ class Shop
     #[Groups(['getShop', 'getAllShops'])]
     private ?string $name = null;
 
-    #[Groups(['getShop', 'getAllShops'])]
     #[Assert\NotNull()]
     #[Assert\NotBlank(message: "Il faut renseigner le code postal")]
     #[ORM\Column(length: 5)]
@@ -47,7 +46,6 @@ class Shop
     #[Groups(['getShop', 'getAllShops'])]
     private ?string $poastalCode = null;
 
-    #[Groups(['getShop', 'getAllShops'])]
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['getShop', 'getAllShops'])]
     private ?string $location = null;

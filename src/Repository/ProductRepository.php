@@ -66,13 +66,13 @@ class ProductRepository extends ServiceEntityRepository
 //    }
 
     /**
-     * Retourne les produits actives, paginées par $page à la $limite
+     * Retourne les produits actifs, paginées par $page à la $limite
      * @param int $page
      * @param int $limit limite de produits par page
      */
     public function findProducts(int $page, int $limit) {
-        $qb = $this->createQueryBuilder('P');
-        $qb->where($qb->expr()->eq('P.status', true))
+        $qb = $this->createQueryBuilder('p');
+        $qb->where($qb->expr()->eq('p.status', "1"))
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
         return $qb->getQuery()->getResult();

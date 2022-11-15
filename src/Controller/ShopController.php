@@ -110,18 +110,17 @@ class ShopController extends AbstractController
     ) :JsonResponse
     {
 
-        $updateShop = $serializer->deserialize(
+        dd($shop);
+        $shop = $serializer->deserialize(
             $request->getContent(),
             Shop::class,
             'json');
-        $shop->setName($updateShop->getName() ? $updateShop->getName() : $shop->getName());
-        $shop->setPoastalCode($updateShop->getPoastalCode() ? $updateShop->getPoastalCode() : $updateShop->getType());
 
         $shop->setSatus("1");
 
         $erors = $validator->validate($shop);
         if ($erors->count() >0) {
-            return new JsonResponse($serializer->serialize($erors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse($serializer->serialize($erors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
         }
 
         $entityManager->persist($shop);
@@ -142,18 +141,15 @@ class ShopController extends AbstractController
          Request $request,
          EntityManagerInterface $entityManager,
          SerializerInterface $serializer,
-         ShopRepository $shopRepository,
          UrlGeneratorInterface $urlGenerator
      ): JsonResponse {
-         $shop = $serializer->deserialize(
+         $updateShop = $serializer->deserialize(
              $request->getContent(),
              Shop::class,
-             'json',
-         );
+             'json');
+         $shop->setName($updateShop->getName() ? $updateShop->getName() : $shop->getName());
+         $shop->setPoastalCode($updateShop->getPoastalCode() ? $updateShop->getPoastalCode() : $shop->getPoastalCode());
          $shop->setSatus("1");
-
-         $content = $request->toArray();
-         $id = $content['idShop'];
 
          $entityManager->persist($shop);
          $entityManager->flush();

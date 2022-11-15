@@ -85,7 +85,7 @@ class CategoryController extends AbstractController
      * @throws \Psr\Cache\InvalidArgumentException
      */
     #[Route('/api/category/{idCategory}', name: 'categories.deleteCategory', methods: ['DELETE'])]
-    #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\category')]
+    #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\Category')]
     public function deleteCategory(
         Category $category,
         EntityManagerInterface $entityManager,
@@ -93,8 +93,7 @@ class CategoryController extends AbstractController
     ) :JsonResponse
     {
         $cache->invalidateTags(["getCategory"]);
-
-        $entityManager->remove($category);
+        $category->setStatus("0");
         $entityManager->flush();
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
@@ -135,7 +134,7 @@ class CategoryController extends AbstractController
     #[Route('/api/category/{idCategory}', name: 'Category.update', methods: ['PUT'])]
     #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\Category')]
     public function updateCategory(
-        Category $Category,
+        Category $category,
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
@@ -149,22 +148,19 @@ class CategoryController extends AbstractController
             'json'
         );
 
-        $Category->setName($updateCategory->getName() ? $updateCategory->getName() : $Category->getName());
-        $Category->setType($updateCategory->getType() ? $updateCategory->getType() : $Category->getType());
+        $category->setName($updateCategory->getName() ? $updateCategory->getName() : $category->getName());
+        $category->setType($updateCategory->getType() ? $updateCategory->getType() : $category->getType());
+        $category->setStatus("1");
 
-        $Category->setStatus("1");
 
-        $content = $request->toArray();
-        $id = $content['idCategory'];
-
-        $entityManager->persist($Category);
+        $entityManager->persist($category);
         $entityManager->flush();
 
-        $location = $urlGenerator->generate("categories.getCategory", ['idCategory' => $Category->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGenerator->generate("categories.getCategory", ['idCategory' => $category->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $context = SerializationContext::create()->setGroups(["getAllCategories"]);
 
-        $jsonBoutique = $serializer->serialize($Category, 'json', $context /*['groups' => 'getAllCategories']*/);
-        return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, ['$location' => ''], true);
+        $jsonBoutique = $serializer->serialize($category, 'json', $context);
+        return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, [$location => ''], true);
     }
 }

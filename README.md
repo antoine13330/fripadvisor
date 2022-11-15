@@ -10,6 +10,8 @@ If you didn't already:
  - configure your DATABASE_URL in .env.local file  where ```mysql://DB_USER@127.0.0.1:3306/DB_NAME?serverVersion=14&charset=utf8```. U can set a passphrase to your db.
  - if you want fake datas use in console ```php bin/console doctrine:fixtures:load```
 
+CtrlC/V .env and rename it .env.local.
+
 JWT TOKEN CONFIGURATION : 
 - create dir jwt in config
 - open git bash at project's root

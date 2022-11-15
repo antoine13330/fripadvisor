@@ -26,9 +26,10 @@ use Hateoas\Configuration\Annotation as Hateoas;
 class Shop
 {
     #[ORM\Id]
+    #[Assert\NotNull()]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getShop', 'getAllShops'])]
+    #[Groups(['getShop', 'getAllShops', 'getProduct', 'getAllProducts'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -39,6 +40,7 @@ class Shop
     private ?string $name = null;
 
     #[ORM\Column(length: 5)]
+    #[Assert\NotNull()]
     #[Groups(['getShop', 'getAllShops'])]
     private ?string $poastalCode = null;
 

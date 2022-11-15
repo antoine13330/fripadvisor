@@ -80,7 +80,7 @@ nelmio_api_doc:
                 get:
                     tags:
                         - Shops
-                    summary: Get all the shops.
+                    summary: Get all the actives shops.
 
                     responses:
                         "200":
@@ -102,7 +102,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
             /api/shop/{idShop}:
                 get:
                     tags:
@@ -129,7 +130,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
                 put:
                     tags:
                         - Shops
@@ -157,7 +159,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
                 delete:
                     tags:
                         - Shops
@@ -174,7 +177,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
             /api/shop:
                 post:
                     tags:
@@ -203,12 +207,13 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
             /api/categories:
                 get:
                     tags:
                         - Categories
-                    summary: Get all the categories.
+                    summary: Get all the actives categories.
 
                     responses:
                         "200":
@@ -228,7 +233,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
             /api/category/{idCategory}:
                 get:
                     tags:
@@ -253,7 +259,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
                 put:
                     tags:
                         - Categories
@@ -279,7 +286,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
                 delete:
                     tags:
                         - Categories
@@ -296,7 +304,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
             /api/category:
                 post:
                     tags:
@@ -323,13 +332,14 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
 
             /api/products:
                 get:
                     tags:
                         - Products
-                    summary: Get all the products.
+                    summary: Get all the actives products.
 
                     responses:
                         "200":
@@ -353,7 +363,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
             /api/product/{idProduct}:
                 get:
                     tags:
@@ -382,7 +393,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
                 put:
                     tags:
                         - Products
@@ -414,7 +426,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
                 delete:
                     tags:
                         - Products
@@ -431,7 +444,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
             /api/product:
                 post:
                     tags:
@@ -464,7 +478,8 @@ nelmio_api_doc:
                             description: Invalid credentials
                         "400":
                             description: Invalid JSON.
-                    security: [ ]
+                    security:
+                        - Bearer: [ ]
 
 
 

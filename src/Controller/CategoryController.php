@@ -37,7 +37,7 @@ class CategoryController extends AbstractController
     }
 
     #[Route('/api/categories', name: 'categories.getAll', methods: ['GET'])]
-    public function getAllcategories(
+    public function getAllCategories(
         CategoryRepository $repository,
         SerializerInterface $serializer,
         Request $request,
@@ -45,19 +45,16 @@ class CategoryController extends AbstractController
     ) :JsonResponse
     {
         $idCache = 'getAllCategories';
-        $context = SerializationContext::create()->setGroups(["getAllCategories"]);
-
-        $jsonCategory = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $context, $request) {
-            echo "MISE EN CACHE";
+        $jsonCategory = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request) {
             $item->tag('CategoryCache');
+            $context = SerializationContext::create()->setGroups(["getAllCategories"]);
 
             $page = $request->get('page', 1);
             $limit = $request->get('limit', 5);
-            $limit = $limit > 20 ? 20 : $limit;
-            $category = $this->json($repository->findCategories($page, $limit), 200, [], ['groups' => 'getAllCategories']);
+            $limit = min($limit, 20);
 
-        return $serializer->serialize($category, 'json', $context);
-
+            $category = $this->json($repository->findCategories($page, $limit));
+            return $serializer->serialize($category, 'json', $context);
         } );
         return new JsonResponse($jsonCategory, 200, [], true);
     }

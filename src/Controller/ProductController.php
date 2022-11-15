@@ -40,17 +40,17 @@ class ProductController extends AbstractController
         TagAwareCacheInterface $cache
     ) :JsonResponse
     {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 5);
-        $limit = $limit > 20 ? 20 : $limit;
-
         $idCache = 'getAllProducts';
-        $jsonProduct = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer) {
-            echo "MISE EN CACHE";
+        $jsonProduct = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request) {
             $item->tag('ProductCache');
+            $context = SerializationContext::create()->setGroups(["getProduct"]);
 
-            $product = $repository->findAll();
-            return $serializer->serialize($product, 'json', ['groups' => 'getAllProducts']);
+            $page = $request->get('page', 1);
+            $limit = $request->get('limit', 5);
+            $limit = min($limit, 20);
+
+            $product = $repository->findProducts($page, $limit);
+            return $serializer->serialize($product, 'json', $context);
 
         } );
         return new JsonResponse($jsonProduct, 200, [], true);
@@ -113,7 +113,7 @@ class ProductController extends AbstractController
 
         $erors = $validator->validate($product);
         if ($erors->count() >0) {
-            return new JsonResponse($serializer->serialize($erors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
+            return new JsonResponse($serializer->serialize($erors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
         }
 
         $entityManager->persist($product);
@@ -129,7 +129,7 @@ class ProductController extends AbstractController
     // update route
     #[Route('/api/product/{idProduct}', name: 'Product.update', methods: ['PUT'])]
     public function updateProduct(
-        Product $Product,
+        Product $product,
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
@@ -141,18 +141,18 @@ class ProductController extends AbstractController
             Product::class,
             'json',
         );
-        $Product->setStatus("1");
+        $product->setStatus("1");
 
         $content = $request->toArray();
         $id = $content['idProduct'];
 
-        $entityManager->persist($Product);
+        $entityManager->persist($product);
         $entityManager->flush();
 
-        $location = $urlGenerator->generate("products.getProduct", ['idProduct' => $Product->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGenerator->generate("products.getProduct", ['idProduct' => $product->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
         $context = SerializationContext::create()->setGroups(["getAllProducts"]);
 
-        $jsonBoutique = $serializer->serialize($Product, 'json', $context);
-        return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, ['$location' => ''], true);
+        $jsonBoutique = $serializer->serialize($product, 'json', $context);
+        return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, [$location => ''], true);
     }
 }

@@ -20,4 +20,5 @@ After launching server, you can access the documentation at adress <http://127.0
 
 ### Debugging ####
 
-If
+- If your server did start but you can't make any request due to unaccessible DB, check your db credentials in DATABASE_URL. 
+  - If it didn't solve the problem check your mysql server status.  ( Check if port 3306 is used with ``` netstat -ano in cmd```. If so : use ```taskkill /F /PID pid_using_port```.

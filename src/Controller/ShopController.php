@@ -41,23 +41,21 @@ class ShopController extends AbstractController
         SerializerInterface $serializer
     ) :JsonResponse
     {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 5);
-        $limit = $limit > 20 ? 20 : $limit;
-
         $idCache = 'getAllShops';
-        $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer) {
+        $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request) {
             echo "MISE EN CACHE";
             $item->tag('ShopCache');
             $context = SerializationContext::create()->setGroups(["getAllShops"]);
 
-            $shop = $repository->findAll();
+            $page = $request->get('page', 1);
+            $limit = $request->get('limit', 5);
+            $limit = $limit > 20 ? 20 : $limit;
+
+            $shop = $repository->findShops($page, $limit);
             return $serializer->serialize($shop, 'json', $context);
 
         } );
         return new JsonResponse($jsonShop, 200, [], true);
-
-        // return $this->json($repository->findShops($page, $limit), 200, [], ['groups' => 'getAllShops']);
     }
 
     /**
@@ -138,7 +136,7 @@ class ShopController extends AbstractController
     }
 
      // update route
-     #[Route('/api/shop/{id}', name: 'Shop.update', methods: ['PUT'])]
+     #[Route('/api/shop/{idShop}', name: 'Shop.update', methods: ['PUT'])]
      public function updateShop(
          Shop $Shop,
          Request $request,

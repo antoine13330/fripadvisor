@@ -44,20 +44,18 @@ class CategoryController extends AbstractController
         TagAwareCacheInterface $cache
     ) :JsonResponse
     {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 5);
-        $limit = $limit > 20 ? 20 : $limit;
-        // return $this->json($repository->findCategories($page, $limit), 200, [], ['groups' => 'getAllCategories']);
-
         $idCache = 'getAllCategories';
         $context = SerializationContext::create()->setGroups(["getAllCategories"]);
 
-        $jsonCategory = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $context) {
+        $jsonCategory = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $context, $request) {
             echo "MISE EN CACHE";
             $item->tag('CategoryCache');
 
+            $page = $request->get('page', 1);
+            $limit = $request->get('limit', 5);
+            $limit = $limit > 20 ? 20 : $limit;
+            $category = $this->json($repository->findCategories($page, $limit), 200, [], ['groups' => 'getAllCategories']);
 
-            $category = $repository->findAll();
         return $serializer->serialize($category, 'json', $context);
 
         } );
@@ -86,6 +84,9 @@ class CategoryController extends AbstractController
         return new JsonResponse($jsonCategory, Response::HTTP_OK, [], true);
     }
 
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     #[Route('/api/category/{idCategory}', name: 'categories.deleteCategory', methods: ['DELETE'])]
     #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\category')]
     public function deleteCategory(
@@ -94,7 +95,7 @@ class CategoryController extends AbstractController
         TagAwareCacheInterface $cache
     ) :JsonResponse
     {
-        // $cache->invalidateTags{["categoryCache"]};
+        $cache->invalidateTags(["getCategory"]);
 
         $entityManager->remove($category);
         $entityManager->flush();
@@ -134,8 +135,8 @@ class CategoryController extends AbstractController
     }
 
     // update route
-    #[Route('/api/category/{id}', name: 'Category.update', methods: ['PUT'])]
-    // #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\Category')]
+    #[Route('/api/category/{idCategory}', name: 'Category.update', methods: ['PUT'])]
+    #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\Category')]
     public function updateCategory(
         Category $Category,
         Request $request,
@@ -144,12 +145,6 @@ class CategoryController extends AbstractController
         CategoryRepository $categoryRepository,
         UrlGeneratorInterface $urlGenerator
     ): JsonResponse {
-        // $Category = $serializer->deserialize(
-        //     $request->getContent(),
-        //     Category::class,
-        //     'json',
-        //     [AbstractNormalizer::OBJECT_TO_POPULATE => $Category]
-        // );
 
         $updateCategory = $serializer->deserialize(
             $request->getContent(),
@@ -173,6 +168,6 @@ class CategoryController extends AbstractController
         $context = SerializationContext::create()->setGroups(["getAllCategories"]);
 
         $jsonBoutique = $serializer->serialize($Category, 'json', $context /*['groups' => 'getAllCategories']*/);
-        return new JsonResponse($jsonBoutique, JsonResponse::HTTP_CREATED, ['$location' => ''], true);
+        return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, ['$location' => ''], true);
     }
 }

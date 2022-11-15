@@ -47,7 +47,6 @@ class Shop
     private ?string $location = null;
 
     #[ORM\Column(length: 1)]
-    #[Groups(['getShop', 'getAllShops'])]
     private ?string $satus = null;
 
     #[ORM\OneToMany(mappedBy: 'idShop', targetEntity: Product::class)]

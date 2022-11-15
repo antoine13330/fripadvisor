@@ -127,7 +127,7 @@ class ProductController extends AbstractController
     }
 
     // update route
-    #[Route('/api/product/{id}', name: 'Product.update', methods: ['PUT'])]
+    #[Route('/api/product/{idProduct}', name: 'Product.update', methods: ['PUT'])]
     public function updateProduct(
         Product $Product,
         Request $request,

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use phpDocumentor\Reflection\Types\Context;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -14,10 +15,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\Serializer;
+use JMS\Serializer\SerializationContext;
 
 class ShopController extends AbstractController
 {
@@ -38,48 +41,68 @@ class ShopController extends AbstractController
         TagAwareCacheInterface $cache
     ) :JsonResponse
     {
-        //$page = $request->get('page', 1);
-        //$limit = $request->get('limit', 5);
-        //$limit = $limit > 20 ? 20 : $limit;
-        //return $this->json($repository->findShops($page, $limit), 200, [], ['groups' => 'getAllShops']);
-        //
+        $idCache = 'getShop';
+        $jsonShops = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request) {
+            $page = $request->get('page', 1);
+            $limit = $request->get('limit', 5);
+            $limit = min($limit, 20);
 
-        $idCache = 'getAllShops';
-        $shops = $cache->get($idCache, function (ItemInterface $item) use ($repository) {
-            $item->tag("shopCache");
-            return $repository->findAll();
+            $item->tag("getShop");
+            $context = SerializationContext::create()->setGroups('getAllShops');
+
+            $shops = $repository->findShops($page, $limit);
+            return $serializer->serialize($shops, 'json', $context);
         });
 
-        $jsonShops = $serializer->serialize($shops, 'json', ['groups' => 'getAllShops']);
         return new JsonResponse($jsonShops, Response::HTTP_OK, [], true);
     }
 
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     #[Route('/api/shop/{idShop}', name: 'shops.getShop', methods: ['GET'])]
     #[ParamConverter("shop", options: ["id" => "idShop"], class: 'App\Entity\Shop')]
     public function getShop(
         Shop $shop,
+        ShopRepository $repository,
         Request $request,
-        SerializerInterface $serializer
+        SerializerInterface $serializer,
+        TagAwareCacheInterface $cache
     ) :JsonResponse
     {
-        return $this->json($shop, 200, [], ['groups' => 'getShop']);
+        $idCache = 'getShop';
+        $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request, $shop) {
+            $item->tag("getShop");
+            $context = SerializationContext::create()->setGroups('getShop');
+
+            $shops = $repository->find($shop);
+            return $serializer->serialize($shops, 'json', $context);
+        });
+
+        return new JsonResponse($jsonShop, Response::HTTP_OK, [], true);
     }
 
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     #[Route('/api/shop/{idShop}', name: 'shops.deleteShop', methods: ['DELETE'])]
     #[ParamConverter("shop", options: ["id" => "idShop"], class: 'App\Entity\Shop')]
     public function deleteShop(
         Shop $shop,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        TagAwareCacheInterface $cache
     ) :JsonResponse
     {
-        $entityManager->remove($shop);
+        $cache->invalidateTags(["getShop"]);
+        $shop->setSatus("0");
         $entityManager->flush();
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(null, Response::HTTP_OK);
     }
 
     #[Route('/api/shop', name: '$shop.create', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas admin')]
     public function createShop(
+        Shop $shop,
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
@@ -87,8 +110,14 @@ class ShopController extends AbstractController
         ValidatorInterface $validator,
     ) :JsonResponse
     {
-        $shop = $serializer->deserialize($request->getContent(), Shop::class, 'json');
-        $shop->setStatus(true);
+        $updateShop = $serializer->deserialize(
+            $request->getContent(),
+            Shop::class,
+            'json');
+        $shop->setName($updateShop->getName() ? $updateShop->getName() : $updateShop->getName());
+        $shop->setPoastalCode($updateShop->getPoastalCode() ? $updateShop->getPoastalCode() : $updateShop->getType());
+
+        $shop->setSatus("1");
 
         //$content = $request->toArray();
         //$idCategorie = $content["idCategorie"];

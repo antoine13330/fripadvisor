@@ -6,6 +6,7 @@ use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 class Product
@@ -13,28 +14,35 @@ class Product
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['getShop', 'getAllShops'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'products')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?shop $idShop = null;
+    #[Groups(['getShop', 'getAllShops'])]
+    private ?Shop $idShop = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['getShop', 'getAllShops'])]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(['getShop', 'getAllShops'])]
     private ?int $price = null;
 
     #[ORM\Column(length: 20)]
+    #[Groups(['getShop', 'getAllShops'])]
     private ?string $size = null;
 
     #[ORM\Column]
+    #[Groups(['getShop', 'getAllShops'])]
     private ?int $stock = null;
 
     #[ORM\Column(length: 1)]
     private ?string $status = null;
 
     #[ORM\ManyToMany(targetEntity: Category::class, mappedBy: 'relation')]
+    #[Groups(['getShop', 'getAllShops'])]
     private Collection $idCategory;
 
     public function __construct()

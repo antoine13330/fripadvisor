@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Category;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use http\Client\Response;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -69,9 +70,8 @@ class CategoryRepository extends ServiceEntityRepository
      * Retourne les catégories actives, paginées par $page à la $limite
      * @param int $page
      * @param int $limit limite de categories par page
-     * @return Request
      */
-    public function findCategories(int $page, int $limit): Request {
+    public function findCategories(int $page, int $limit) {
         $qb = $this->createQueryBuilder('c');
         $qb->where($qb->expr()->eq('c.status', true))
             ->setFirstResult(($page - 1) * $limit)

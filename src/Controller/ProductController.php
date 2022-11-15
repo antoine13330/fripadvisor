@@ -9,15 +9,19 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\Product;
-use App\Repository\productRepository;
+use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Contracts\Cache\ItemInterface;
+use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use JMS\Serializer\SerializerInterface;
+use JMS\Serializer\Serializer;
+use JMS\Serializer\SerializationContext;
 
 class ProductController extends AbstractController
 {
@@ -34,12 +38,25 @@ class ProductController extends AbstractController
     public function getAllProducts(
         ProductRepository $repository,
         Request $request,
+        SerializerInterface $serializer,
+        TagAwareCacheInterface $cache
     ) :JsonResponse
     {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 5);
-        $limit = $limit > 20 ? 20 : $limit;
-        return $this->json($repository->findProducts($page, $limit), 200, [], ['groups' => 'getAllProducts']);
+        $idCache = 'getProduct';
+
+        $jsonProducts = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request) {
+            $page = $request->get('page', 1);
+            $limit = $request->get('limit', 5);
+            $limit = min($limit, 20);
+
+            $item->tag("getProduct");
+            $context = SerializationContext::create()->setGroups('getAllProducts');
+
+            $shops = $repository->findProducts($page, $limit);
+            return $serializer->serialize($shops, 'json', $context);
+        });
+
+        return new JsonResponse($jsonProducts, Response::HTTP_OK, [], true);
     }
 
     #[Route('/api/product/{idProduct}', name: 'products.getproduct', methods: ['GET'])]
@@ -47,22 +64,38 @@ class ProductController extends AbstractController
     public function getProduct(
         Product $product,
         Request $request,
-        SerializerInterface $serializer
+        ProductRepository $repository,
+        SerializerInterface $serializer,
+        TagAwareCacheInterface $cache
     ) :JsonResponse
     {
-        return $this->json($product, 200, [], ['groups' => 'getProduct']);
+        $idCache = 'getProduct';
+        $jsonProduct = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request, $product) {
+            $item->tag("getProduct");
+            $context = SerializationContext::create()->setGroups('getProduct');
+
+            $products = $repository->find($product);
+            return $serializer->serialize($products, 'json', $context);
+        });
+
+        return new JsonResponse($jsonProduct, Response::HTTP_OK, [], true);
     }
 
+    /**
+     * @throws \Psr\Cache\InvalidArgumentException
+     */
     #[Route('/api/product/{idProduct}', name: 'products.deleteProduct', methods: ['DELETE'])]
-    #[ParamConverter("product", options: ["id" => "idProduct"], class: 'App\Entity\product')]
+    #[ParamConverter("product", options: ["id" => "idProduct"], class: 'App\Entity\Product')]
     public function deleteProduct(
         Product $product,
-        EntityManagerInterface $entityManager
+        EntityManagerInterface $entityManager,
+        TagAwareCacheInterface $cache
     ) :JsonResponse
     {
-        $entityManager->remove($product);
+        $cache->invalidateTags(["getProduct"]);
+        $product->setStatus("0");
         $entityManager->flush();
-        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
+        return new JsonResponse(null, Response::HTTP_OK);
     }
 
     #[Route('/api/product', name: '$product.create', methods: ['POST'])]
@@ -75,7 +108,7 @@ class ProductController extends AbstractController
         ValidatorInterface $validator,
     ) :JsonResponse
     {
-        $product = $serializer->deserialize($request->getContent(), product::class, 'json');
+        $product = $serializer->deserialize($request->getContent(), Product::class, 'json');
         $product->setStatus(true);
 
         //$content = $request->toArray();
@@ -97,7 +130,7 @@ class ProductController extends AbstractController
     #[Route('/api/product/{id}', name: 'products.updateProduct', methods: ['PATCH'])]
     #[ParamConverter("product", options: ["id" => "idProduct"], class: 'App\Entity\product')]
     public function updateProduct(
-        product $product,
+        Product $product,
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
@@ -105,7 +138,7 @@ class ProductController extends AbstractController
         ValidatorInterface $validator,
     ) :JsonResponse
     {
-        $product = $serializer->deserialize($request->getContent(), product::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $product]);
+        $product = $serializer->deserialize($request->getContent(), Product::class, 'json', [AbstractNormalizer::OBJECT_TO_POPULATE => $product]);
         $product->setStatus(true);
 
         $content = $request->toArray();

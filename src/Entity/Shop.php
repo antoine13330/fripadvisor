@@ -6,8 +6,21 @@ use App\Repository\ShopRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Hateoas\Configuration\Annotation as Hateoas;
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href=@Hateoas\Route(
+ *      "shops.getShop",
+ *      parameters= {
+ *          "idShop" = "expr(object.getId())"
+ *      }
+ *     ),
+ *     exclusion = @Hateoas\Exclusion(groups="getAllShops")
+ * )
+ */
 
 #[ORM\Entity(repositoryClass: ShopRepository::class)]
 class Shop
@@ -29,14 +42,17 @@ class Shop
     #[Assert\NotNull()]
     #[Assert\NotBlank(message: "Il faut renseigner le code postal")]
     #[ORM\Column(length: 5)]
+    #[Groups(['getShop', 'getAllShops'])]
     private ?string $poastalCode = null;
 
     #[Groups(['getShop', 'getAllShops'])]
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['getShop', 'getAllShops'])]
     private ?string $location = null;
 
     #[Groups(['getShop', 'getAllShops'])]
     #[ORM\Column(length: 1)]
+    #[Groups(['getShop', 'getAllShops'])]
     private ?string $satus = null;
 
     #[ORM\OneToMany(mappedBy: 'idShop', targetEntity: Product::class)]

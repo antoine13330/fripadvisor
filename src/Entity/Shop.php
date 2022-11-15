@@ -34,20 +34,25 @@ class Shop
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Une boutique doit avoir un nom")]
-    #[Assert\NotNull()]
+    #[Assert\NotNull(message: "Une boutique doit avoir un nom")]
     #[Assert\Length(min: 3, minMessage: "Le nom de la boutique doit faire plus de {{ limit }} lettres")]
     #[Groups(['getShop', 'getAllShops'])]
     private ?string $name = null;
 
+    #[Groups(['getShop', 'getAllShops'])]
+    #[Assert\NotNull()]
+    #[Assert\NotBlank(message: "Il faut renseigner le code postal")]
     #[ORM\Column(length: 5)]
     #[Assert\NotNull()]
     #[Groups(['getShop', 'getAllShops'])]
     private ?string $poastalCode = null;
 
+    #[Groups(['getShop', 'getAllShops'])]
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['getShop', 'getAllShops'])]
     private ?string $location = null;
 
+    #[Groups(['getShop', 'getAllShops'])]
     #[ORM\Column(length: 1)]
     private ?string $satus = null;
 

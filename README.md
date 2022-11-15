@@ -19,7 +19,6 @@ You are set up to request our Fripadvisor API. See the Documentation for more in
 After launching server, you can access the documentation at adress <http://127.0.0.1:8000/api/doc>.
 
 ### Debugging ####
-
+- If your server didnt start, check your apache or NGINX Server is running. 
 - If your server did start but you can't make any request due to unaccessible DB, check your db credentials in DATABASE_URL. 
-  - Didn't solve the problem ? Check your mysql server status.  ( Check if port 3306 is used with ``` netstat -ano in cmd```. If so : use ```taskkill /F /PID PID_USING_PORT``` on windows,  On Debian use ```sudo kill -9 $(sudo lsof -t -i:PORT_NUMBER)```).
-  - 
+  - Didn't solve the problem ? Check your mysql server status.  ( Check if port 3306 is used with ``` netstat -ano in cmd```. If so : use ```taskkill /F /PID PID_USING_PORT``` on **Windows**,  On **Debian** use ```sudo kill -9 $(sudo lsof -t -i:PORT_NUMBER)```).

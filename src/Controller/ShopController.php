@@ -113,6 +113,7 @@ class ShopController extends AbstractController
         ValidatorInterface $validator,
     ) :JsonResponse
     {
+
         $updateShop = $serializer->deserialize(
             $request->getContent(),
             Shop::class,

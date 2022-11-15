@@ -6,6 +6,7 @@ use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -23,12 +24,21 @@ class Product
     #[ORM\JoinColumn(nullable: false)]
     private ?Shop $idShop = null;
 
+
+    #[Assert\NotNull()]
+    #[Assert\NotBlank(message: "Un produit doit avoir un nom")]
+    #[Assert\NotNull(message: "Un produit doit avoir un nom")]
     #[ORM\Column(length: 255)]
     #[Groups(['getProduct', 'getAllProducts'])]
     private ?string $name = null;
 
     #[ORM\Column]
+
+    #[Assert\NotBlank(message: "Un produit doit avoir un prix")]
+    #[Assert\NotNull(message: "Un produit doit avoir un prix")]
+
     #[Groups(['getProduct', 'getAllProducts'])]
+
     private ?int $price = null;
 
     #[ORM\Column(length: 20)]
@@ -36,7 +46,10 @@ class Product
     private ?string $size = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Il faut renseigner le nombre d'éléments en stock")]
+    #[Assert\NotNull(message: "Il faut renseigner le nombre d'éléments en stock")]
     #[Groups(['getProduct', 'getAllProducts'])]
+
     private ?int $stock = null;
 
     #[ORM\Column(length: 1)]

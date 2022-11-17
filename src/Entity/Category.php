@@ -16,7 +16,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  * @Hateoas\Relation(
  *      "self",
  *      href=@Hateoas\Route(
- *      "categories.getAll",
+ *      "categories.getCategory",
  *      parameters={
  *      "idCategory" = "expr(object.getId())"
  *       }

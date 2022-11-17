@@ -42,7 +42,7 @@ class PictureController extends AbstractController
 
         if ($picture) {
             return new JsonResponse($serializer->serialize($picture, 'json', ["groups" => "getPicture"]),
-                JsonResponse::HTTP_OK, ["Location" => $location], true);
+                Response::HTTP_OK, ["Location" => $location], true);
         } else {
             return new JsonResponse(null);
         }
@@ -68,7 +68,7 @@ class PictureController extends AbstractController
         $entityManager->flush();
 
         $location = $urlGenerator->generate("pictures.get", ['idPicture' => $picture->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
-        $jsonBoutique = $serializer->serialize($picture, 'json', ['groups' => 'getBoutique']);
-        return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, ["Location" => $location], true);
+        $jsonShop = $serializer->serialize($picture, 'json', ['groups' => 'getShop']);
+        return new JsonResponse($jsonShop, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 }

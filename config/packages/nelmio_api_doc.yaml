@@ -48,7 +48,6 @@ nelmio_api_doc:
                         "400":
                             description: Invalid JSON.
                     security: []
-
             /api/token/refresh:
                 post:
                     tags:
@@ -77,6 +76,416 @@ nelmio_api_doc:
                         "401":
                             description: An authentication exception occurred.
                     security: []
+            /api/shops:
+                get:
+                    tags:
+                        - Shops
+                    summary: Get all the actives shops.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: int
+                                            name:
+                                                type: string
+                                            poastal_code:
+                                                type: string
+                                            location:
+                                                type: string
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+            /api/shop/{idShop}:
+                get:
+                    tags:
+                        - Shops
+                    summary: Get a shop by id.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: int
+                                            name:
+                                                type: string
+                                            poastal_code:
+                                                type: string
+                                            location:
+                                                type: string
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+                put:
+                    tags:
+                        - Shops
+                    summary: Update a shop by id.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        name:
+                                            type: string
+                                        poastalCode:
+                                            type: string
+                                        location:
+                                            type: string
+                                    type: object
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+                delete:
+                    tags:
+                        - Shops
+                    summary: Delete a shop by id.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+            /api/shop:
+                post:
+                    tags:
+                        - Shops
+                    summary: Create a shop.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        name:
+                                            type: string
+                                        poastalCode:
+                                            type: string
+                                        location:
+                                            type: string
+                                    type: object
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+            /api/categories:
+                get:
+                    tags:
+                        - Categories
+                    summary: Get all the actives categories.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: int
+                                            name:
+                                                type: string
+                                            type:
+                                                type: string
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+            /api/category/{idCategory}:
+                get:
+                    tags:
+                        - Categories
+                    summary: Get a category by id.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: int
+                                            name:
+                                                type: string
+                                            type:
+                                                type: string
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+                put:
+                    tags:
+                        - Categories
+                    summary: Update a category by id.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        name:
+                                            type: string
+                                        type:
+                                            type: string
+                                    type: object
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+                delete:
+                    tags:
+                        - Categories
+                    summary: Delete a category by id.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+            /api/category:
+                post:
+                    tags:
+                        - Categories
+                    summary: Create a category.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        name:
+                                            type: string
+                                        type:
+                                            type: string
+                                    type: object
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+
+            /api/products:
+                get:
+                    tags:
+                        - Products
+                    summary: Get all the actives products.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: int
+                                            name:
+                                                type: string
+                                            price:
+                                                type: string
+                                            size:
+                                                type: string
+                                            stock:
+                                                type: string
+                                            id_shop_id:
+                                                type: int
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+            /api/product/{idProduct}:
+                get:
+                    tags:
+                        - Products
+                    summary: Get a product by id.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: int
+                                            name:
+                                                type: string
+                                            price:
+                                                type: string
+                                            size:
+                                                type: string
+                                            stock:
+                                                type: string
+                                            id_shop_id:
+                                                type: int
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+                put:
+                    tags:
+                        - Products
+                    summary: Update a product by id.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        name:
+                                            type: string
+                                        price:
+                                            type: string
+                                        size:
+                                            type: string
+                                        stock:
+                                            type: string
+                                        id_shop_id:
+                                            type: int
+                                    type: object
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+                delete:
+                    tags:
+                        - Products
+                    summary: Delete a product by id.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+            /api/product:
+                post:
+                    tags:
+                        - Products
+                    summary: Create a product.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        name:
+                                            type: string
+                                        price:
+                                            type: string
+                                        size:
+                                            type: string
+                                        stock:
+                                            type: string
+                                        id_shop_id:
+                                            type: int
+                                    type: object
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+
+
 
     areas: # to filter documented areas
         path_patterns:

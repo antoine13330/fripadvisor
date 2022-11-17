@@ -26,9 +26,10 @@ use Hateoas\Configuration\Annotation as Hateoas;
 class Shop
 {
     #[ORM\Id]
+    #[Assert\NotNull()]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['getShop', 'getAllShops'])]
+    #[Groups(['getShop', 'getAllShops', 'getProduct', 'getAllProducts'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -38,21 +39,19 @@ class Shop
     #[Groups(['getShop', 'getAllShops'])]
     private ?string $name = null;
 
-    #[Groups(['getShop', 'getAllShops'])]
     #[Assert\NotNull()]
     #[Assert\NotBlank(message: "Il faut renseigner le code postal")]
     #[ORM\Column(length: 5)]
+    #[Assert\NotNull()]
     #[Groups(['getShop', 'getAllShops'])]
     private ?string $poastalCode = null;
 
-    #[Groups(['getShop', 'getAllShops'])]
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['getShop', 'getAllShops'])]
     private ?string $location = null;
 
     #[Groups(['getShop', 'getAllShops'])]
     #[ORM\Column(length: 1)]
-    #[Groups(['getShop', 'getAllShops'])]
     private ?string $satus = null;
 
     #[ORM\OneToMany(mappedBy: 'idShop', targetEntity: Product::class)]
@@ -145,51 +144,4 @@ class Shop
 
         return $this;
     }
-
-//    public function getBoutiqueCategorie(): Collection
-//    {
-//        return $this->boutiqueCategorie;
-//    }
-
-//    public function addBoutiqueCategorie(Categorie $boutiqueCategorie): self
-//    {
-//        if (!$this->boutiqueCategorie->contains($boutiqueCategorie)) {
-//            $this->boutiqueCategorie->add($boutiqueCategorie);
-//            $boutiqueCategorie->addBoutiqueCategorie($this);
-//        }
-
-//        return $this;
-//    }
-
-//    public function removeBoutiqueCategorie(Categorie $boutiqueCategorie): self
-//    {
-//        if ($this->boutiqueCategorie->removeElement($boutiqueCategorie)) {
-//            $boutiqueCategorie->removeBoutiqueCategorie($this);
-//        }
-
-//        return $this;
-//    }
-
-//
-// #[ORM\Id]
-//    #[ORM\GeneratedValue]
-//    #[ORM\Column]
-//    #[Groups(['getCategorie', 'getAllCategories'])]
-//    private ?int $id = null;
-//
-//    #[ORM\ManyToMany(targetEntity: Boutique::class, inversedBy: 'boutiqueCategorie')]
-//    #[Groups(['getCategorie', 'getAllCategories'])]
-//    private Collection $boutiqueCategorie;
-//
-//    #[ORM\Column]
-//    private ?bool $status = null;
-//
-//    #[ORM\Column(length: 255)]
-//    #[Assert\NotBlank(message: "Une catégorie doit avoir un nom")]
-//    #[Assert\NotNull()]
-//    #[Assert\Length(min: 3, minMessage: "Le nom de la catégorie doit faire plus de {{ limit }} lettres")]
-//    #[Groups(['getCategorie', 'getAllCategories', 'getBoutique', 'getAllBoutiques'])]
-//    private ?string $categorieNom = null;
-//
-
 }

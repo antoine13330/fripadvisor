@@ -13,7 +13,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  * @Hateoas\Relation(
  *      "self",
  *      href=@Hateoas\Route(
- *      "shops.getProduct",
+ *      "products.getProduct",
  *      parameters= {
  *          "idProduct" = "expr(object.getId())"
  *      }

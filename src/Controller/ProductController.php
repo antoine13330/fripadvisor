@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\ShopRepository;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -98,7 +99,7 @@ class ProductController extends AbstractController
         return new JsonResponse(null, Response::HTTP_OK);
     }
 
-    #[Route('/api/product', name: '$product.create', methods: ['POST'])]
+    #[Route('/api/product', name: 'product.create', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas admin')]
     public function createProduct(
         Request $request,
@@ -106,9 +107,19 @@ class ProductController extends AbstractController
         SerializerInterface $serializer,
         UrlGeneratorInterface $urlGenerator,
         ValidatorInterface $validator,
+        ShopRepository $shopRepository
     ) :JsonResponse
     {
-        $product = $serializer->deserialize($request->getContent(), Product::class, 'json');
+        $product = $serializer->deserialize(
+            $request->getContent(),
+            Product::class,
+            'json'
+        );
+        $product->setName($product->getName());
+        $product->setPrice($product->getPrice());
+        $product->setSize($product->getSize());
+        $product->setStock($product->getStock());
+        $product->setIdShop($shopRepository->find($product->getIdShop()));
         $product->setStatus(true);
 
         $erors = $validator->validate($product);
@@ -127,14 +138,15 @@ class ProductController extends AbstractController
     }
 
     // update route
-    #[Route('/api/product/{idProduct}', name: 'Product.update', methods: ['PUT'])]
+    #[Route('/api/product/{idProduct}', name: 'product.update', methods: ['PUT'])]
+    #[ParamConverter("product", class: 'App\Entity\Product', options: ["id" => "idProduct"])]
     public function updateProduct(
         Product $product,
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
-        ProductRepository $productRepository,
-        UrlGeneratorInterface $urlGenerator
+        UrlGeneratorInterface $urlGenerator,
+        ShopRepository $shopRepository
     ): JsonResponse {
         $updateProduct = $serializer->deserialize(
             $request->getContent(),
@@ -145,6 +157,7 @@ class ProductController extends AbstractController
         $product->setPrice($updateProduct->getPrice() ? $updateProduct->getPrice() : $product->getPrice());
         $product->setSize($updateProduct->getSize() ? $updateProduct->getSize() : $product->getSize());
         $product->setStock($updateProduct->getStock() ? $updateProduct->getStock() : $product->getStock());
+        $product->setIdShop($updateProduct->getIdShop() ? $shopRepository->find($updateProduct->getIdShop()) : $shopRepository->find($product->getIdShop()));
         $product->setStatus("1");
 
         $entityManager->persist($product);

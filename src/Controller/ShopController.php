@@ -14,13 +14,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\Serializer;
-use JMS\Serializer\SerializationContext;
 
 class ShopController extends AbstractController
 {
@@ -98,10 +97,9 @@ class ShopController extends AbstractController
         return new JsonResponse(null, Response::HTTP_OK);
     }
 
-    #[Route('/api/shop', name: '$shop.create', methods: ['POST'])]
+    #[Route('/api/shop', name: 'shop.create', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas admin')]
     public function createShop(
-        Shop $shop,
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
@@ -109,13 +107,12 @@ class ShopController extends AbstractController
         ValidatorInterface $validator,
     ) :JsonResponse
     {
-
-        dd($shop);
-        $shop = $serializer->deserialize(
+       $shop = $serializer->deserialize(
             $request->getContent(),
             Shop::class,
             'json');
-
+        $shop->setName($shop->getName());
+        $shop->setPoastalCode("1");
         $shop->setSatus("1");
 
         $erors = $validator->validate($shop);
@@ -135,7 +132,7 @@ class ShopController extends AbstractController
 
      // update route
      #[Route('/api/shop/{idShop}', name: 'Shop.update', methods: ['PUT'])]
-     #[ParamConverter("shop", options: ["id" => "idShop"], class: 'App\Entity\Shop')]
+     #[ParamConverter("shop", class: 'App\Entity\Shop', options: ["id" => "idShop"])]
      public function updateShop(
          Shop $shop,
          Request $request,

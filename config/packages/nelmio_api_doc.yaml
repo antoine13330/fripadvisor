@@ -359,6 +359,8 @@ nelmio_api_doc:
                                                 type: string
                                             stock:
                                                 type: string
+                                            id_shop_id:
+                                                type: int
                         "401":
                             description: Invalid credentials
                         "400":
@@ -389,6 +391,8 @@ nelmio_api_doc:
                                                 type: string
                                             stock:
                                                 type: string
+                                            id_shop_id:
+                                                type: int
                         "401":
                             description: Invalid credentials
                         "400":
@@ -404,8 +408,6 @@ nelmio_api_doc:
                             application/json:
                                 schema:
                                     properties:
-                                        id:
-                                            type: int
                                         name:
                                             type: string
                                         price:
@@ -414,6 +416,8 @@ nelmio_api_doc:
                                             type: string
                                         stock:
                                             type: string
+                                        id_shop_id:
+                                            type: int
                                     type: object
                     responses:
                         "200":
@@ -456,8 +460,6 @@ nelmio_api_doc:
                             application/json:
                                 schema:
                                     properties:
-                                        id:
-                                            type: int
                                         name:
                                             type: string
                                         price:
@@ -466,6 +468,8 @@ nelmio_api_doc:
                                             type: string
                                         stock:
                                             type: string
+                                        id_shop_id:
+                                            type: int
                                     type: object
                     responses:
                         "200":

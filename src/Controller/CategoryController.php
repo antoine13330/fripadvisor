@@ -13,17 +13,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Context\SerializerContextBuilder;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
-// use Symfony\Component\Serializer\Serializer;
-// use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\Serializer;
-use Symfony\Component\Serializer\SerializerInterface as SerializerSerializerInterface;
 
 class CategoryController extends AbstractController
 {
@@ -60,7 +55,7 @@ class CategoryController extends AbstractController
     }
 
     #[Route('/api/category/{idCategory}', name: 'categories.getCategory', methods: ['GET'])]
-    #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\Category')]
+    #[ParamConverter("category", class: 'App\Entity\Category', options: ["id" => "idCategory"])]
     public function getCategory(
         Category $category,
         CategoryRepository $repository,
@@ -85,7 +80,7 @@ class CategoryController extends AbstractController
      * @throws \Psr\Cache\InvalidArgumentException
      */
     #[Route('/api/category/{idCategory}', name: 'categories.deleteCategory', methods: ['DELETE'])]
-    #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\Category')]
+    #[ParamConverter("category", class: 'App\Entity\Category', options: ["id" => "idCategory"])]
     public function deleteCategory(
         Category $category,
         EntityManagerInterface $entityManager,
@@ -98,10 +93,9 @@ class CategoryController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/api/category', name: '$category.create', methods: ['POST'])]
+    #[Route('/api/category', name: 'category.create', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas admin')]
     public function createCategory(
-        Category $category,
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
@@ -109,12 +103,12 @@ class CategoryController extends AbstractController
         ValidatorInterface $validator,
     ) :JsonResponse
     {
-        $updateCategory = $serializer->deserialize(
+        $category = $serializer->deserialize(
             $request->getContent(),
             Category::class,
             'json');
-        $category->setName($updateCategory->getName() ? $updateCategory->getName() : $category->getName());
-        $category->setType($updateCategory->getType() ? $updateCategory->getType() : $category->getType());
+        $category->setName($category->getName());
+        $category->setType($category->getType());
         $category->setStatus("1");
 
         $errors = $validator->validate($category);
@@ -132,15 +126,21 @@ class CategoryController extends AbstractController
 
     // update route
     #[Route('/api/category/{idCategory}', name: 'Category.update', methods: ['PUT'])]
-    #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\Category')]
+    #[ParamConverter("category", class: 'App\Entity\Category', options: ["id" => "idCategory"])]
     public function updateCategory(
         Category $category,
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
-        CategoryRepository $categoryRepository,
         UrlGeneratorInterface $urlGenerator
     ): JsonResponse {
+
+        // $Category = $serializer->deserialize(
+        //     $request->getContent(),
+        //     Category::class,
+        //     'json',
+        //     [AbstractNormalizer::OBJECT_TO_POPULATE => $Category]
+        // );
 
         $updateCategory = $serializer->deserialize(
             $request->getContent(),

@@ -41,11 +41,9 @@ class ShopController extends AbstractController
     ) :JsonResponse
     {
         $idCache = 'getAllShops';
-        $context = SerializationContext::create()->setGroups(["getAllShops"]);
-
-        $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $context) {
-            echo "MISE EN CACHE";
-            $item->tag('ShopCache');
+        $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request) {
+            $item->tag('getShop');
+            $context = SerializationContext::create()->setGroups(["getAllShops"]);
 
             $page = $request->get('page', 1);
             $limit = $request->get('limit', 5);
@@ -129,47 +127,31 @@ class ShopController extends AbstractController
         return new JsonResponse($jsonShop, Response::HTTP_CREATED, [], true);
     }
 
-    // update route
-    #[Route('/api/shop/{id}', name: 'Shop.update', methods: ['PUT'])]
-    public function updateShop(
-        Shop $shop,
-        Request $request,
-        EntityManagerInterface $entityManager,
-        SerializerInterface $serializer,
-        ShopRepository $shopRepository,
-        ValidatorInterface $validator,
-        UrlGeneratorInterface $urlGenerator
-    ): JsonResponse {
-        $shop = $serializer->deserialize(
-            $request->getContent(),
-            Shop::class,
-            'json',
-        );
-        $shop->setSatus("1");
+     // update route
+     #[Route('/api/shop/{idShop}', name: 'Shop.update', methods: ['PUT'])]
+     #[ParamConverter("shop", class: 'App\Entity\Shop', options: ["id" => "idShop"])]
+     public function updateShop(
+         Shop $shop,
+         Request $request,
+         EntityManagerInterface $entityManager,
+         SerializerInterface $serializer,
+         UrlGeneratorInterface $urlGenerator
+     ): JsonResponse {
+         $updateShop = $serializer->deserialize(
+             $request->getContent(),
+             Shop::class,
+             'json');
+         $shop->setName($updateShop->getName() ? $updateShop->getName() : $shop->getName());
+         $shop->setPoastalCode($updateShop->getPoastalCode() ? $updateShop->getPoastalCode() : $shop->getPoastalCode());
+         $shop->setSatus("1");
 
-        $content = $request->toArray();
-        $id = $content['idShop'];
+         $entityManager->persist($shop);
+         $entityManager->flush();
 
-        $updateShop = $serializer->deserialize(
-           $request->getContent(),
-            Shop::class,
-            'json');
+         $location = $urlGenerator->generate("shops.getShop", ['idShop' => $shop->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+         $context = SerializationContext::create()->setGroups(["getAllShops"]);
 
-        $shop->setName($updateShop->getName() ? $updateShop->getName() : $shop->getName());
-        $shop->setPoastalCode($updateShop->getPoastalCode() ? $updateShop->getPoastalCode() : $updateShop->getType());
-
-        $errors = $validator->validate($shop);
-        if ($errors->count() > 0) {
-            return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
-        }
-
-        $entityManager->persist($shop);
-        $entityManager->flush();
-
-        $location = $urlGenerator->generate("shops.getShop", ['idShop' => $shop->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
-        $context = SerializationContext::create()->setGroups(["getAllShops"]);
-
-        $jsonBoutique = $serializer->serialize($shop, 'json', $context);
-        return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, ['$location' => ''], true);
-    }
+         $jsonBoutique = $serializer->serialize($shop, 'json', $context);
+         return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, [$location => ''], true);
+     }
 }

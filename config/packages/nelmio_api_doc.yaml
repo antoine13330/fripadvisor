@@ -359,7 +359,7 @@ nelmio_api_doc:
                                                 type: string
                                             stock:
                                                 type: string
-                                            id_shop_id:
+                                            idShop:
                                                 type: int
                         "401":
                             description: Invalid credentials
@@ -391,7 +391,7 @@ nelmio_api_doc:
                                                 type: string
                                             stock:
                                                 type: string
-                                            id_shop_id:
+                                            idShop:
                                                 type: int
                         "401":
                             description: Invalid credentials
@@ -416,7 +416,7 @@ nelmio_api_doc:
                                             type: string
                                         stock:
                                             type: string
-                                        id_shop_id:
+                                        idShop:
                                             type: int
                                     type: object
                     responses:
@@ -468,8 +468,106 @@ nelmio_api_doc:
                                             type: string
                                         stock:
                                             type: string
-                                        id_shop_id:
+                                        idShop:
                                             type: int
+                                    type: object
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+            /api/product/{sizeProduct}/{priceProduct}:
+                get:
+                    tags:
+                        - Products
+                    summary: First methode - Get a product by size and price.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: int
+                                            name:
+                                                type: string
+                                            price:
+                                                type: string
+                                            size:
+                                                type: string
+                                            stock:
+                                                type: string
+                                            idShop:
+                                                type: int
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+            /api/pictures/{idPicture}:
+                get:
+                    tags:
+                        - Pictures
+                    summary: Get a picture by id.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        realName:
+                                            type: string
+                                        realPath:
+                                            type: string
+                                        publicPath:
+                                            type: string
+                                        mimeType:
+                                            type: string
+                                    type: object
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+            /api/pictures:
+                post:
+                    tags:
+                        - Pictures
+                    summary: Create a picture.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        id:
+                                            type: int
+                                        realName:
+                                            type: string
+                                        realPath:
+                                            type: string
+                                        publicPath:
+                                            type: string
+                                        mimeType:
+                                            type: string
                                     type: object
                     responses:
                         "200":

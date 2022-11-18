@@ -44,9 +44,12 @@ class CategoryController extends AbstractController
             $item->tag('CategoryCache');
             $context = SerializationContext::create()->setGroups(["getAllCategories"]);
 
-            $category = $repository->findAll();
-            return $serializer->serialize($category, 'json', $context);
+            $page = $request->get('page', 1);
+            $limit = $request->get('limit', 5);
+            $limit = min($limit, 20);
 
+            $category = $this->json($repository->findCategories($page, $limit));
+            return $serializer->serialize($category, 'json', $context);
         } );
         return new JsonResponse($jsonCategory, 200, [], true);
     }
@@ -90,7 +93,6 @@ class CategoryController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    // create
     #[Route('/api/category', name: 'category.create', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas admin')]
     public function createCategory(
@@ -154,11 +156,6 @@ class CategoryController extends AbstractController
         if ($errors->count() >0) {
             return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
         }
-
-        $category->setStatus("1");
-
-        $content = $request->toArray();
-        $id = $content['idCategory'];
 
         $entityManager->persist($category);
         $entityManager->flush();

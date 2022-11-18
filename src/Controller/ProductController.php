@@ -42,15 +42,16 @@ class ProductController extends AbstractController
     ) :JsonResponse
     {
         $idCache = 'getAllProducts';
-        $context = SerializationContext::create()->setGroups(["getAllProducts"]);
-
-        $jsonProduct = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $context) {
-            echo "MISE EN CACHE";
+        $jsonProduct = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request) {
             $item->tag('ProductCache');
             $context = SerializationContext::create()->setGroups(["getProduct"]);
 
-            $product = $repository->findAll();
-            return $serializer->serialize($product, 'json', $context /*['groups' => 'getAllProducts']*/);
+            $page = $request->get('page', 1);
+            $limit = $request->get('limit', 5);
+            $limit = min($limit, 20);
+
+            $product = $repository->findProducts($page, $limit);
+            return $serializer->serialize($product, 'json', $context);
 
         } );
         return new JsonResponse($jsonProduct, 200, [], true);
@@ -84,7 +85,6 @@ class ProductController extends AbstractController
      * @throws \Psr\Cache\InvalidArgumentException
      */
     #[Route('/api/product/{idProduct}', name: 'products.deleteProduct', methods: ['DELETE'])]
-    #[ParamConverter("Product", options: ["id" => "idProduct"], class: 'App\Entity\Product')]
     #[ParamConverter("product", options: ["id" => "idProduct"], class: 'App\Entity\Product')]
     public function deleteProduct(
         Product $product,
@@ -109,7 +109,7 @@ class ProductController extends AbstractController
     ) :JsonResponse
     {
         $newProduct = $serializer->deserialize(
-            $request->getContent(), 
+            $request->getContent(),
             Product::class
             , 'json');
 
@@ -117,8 +117,7 @@ class ProductController extends AbstractController
 
         $content = $request->toArray();
         $idShop = $content["idShop"];
-        $shop = $shopRepository->find($idShop);
-        $newProduct->setIdShop($shop);
+        $newProduct->setIdShop($shopRepository->find($idShop));
 
         $erors = $validator->validate($newProduct);
         if ($erors->count() >0) {
@@ -167,7 +166,7 @@ class ProductController extends AbstractController
         return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, [$location => ''], true);
     }
 
-    // method 1 : recherche par filtres 
+    // methode 1 : recherche par filtres
     #[Route('/api/product/{sizeProduct}/{priceProduct}', name: 'products.getProductByFiltre', methods: ['GET'])]
     public function getProductByFilters(
         int $sizeProduct,

@@ -9,6 +9,19 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 //use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Hateoas\Configuration\Annotation as Hateoas;
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href=@Hateoas\Route(
+ *      "products.getProduct",
+ *      parameters= {
+ *          "idProduct" = "expr(object.getId())"
+ *      }
+ *     ),
+ *     exclusion = @Hateoas\Exclusion(groups="getAllProducts")
+ * )
+ */
 
 
 use Hateoas\Configuration\Annotation as Hateoas;
@@ -40,12 +53,21 @@ class Product
     #[ORM\JoinColumn(nullable: false)]
     private ?Shop $idShop = null;
 
+
+    #[Assert\NotNull()]
+    #[Assert\NotBlank(message: "Un produit doit avoir un nom")]
+    #[Assert\NotNull(message: "Un produit doit avoir un nom")]
     #[ORM\Column(length: 255)]
     #[Groups(['getProduct', 'getAllProducts'])]
     private ?string $name = null;
 
     #[ORM\Column]
+
+    #[Assert\NotBlank(message: "Un produit doit avoir un prix")]
+    #[Assert\NotNull(message: "Un produit doit avoir un prix")]
+
     #[Groups(['getProduct', 'getAllProducts'])]
+
     private ?int $price = null;
 
     #[ORM\Column(length: 20)]
@@ -53,7 +75,10 @@ class Product
     private ?string $size = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "Il faut renseigner le nombre d'éléments en stock")]
+    #[Assert\NotNull(message: "Il faut renseigner le nombre d'éléments en stock")]
     #[Groups(['getProduct', 'getAllProducts'])]
+
     private ?int $stock = null;
 
     #[ORM\Column(length: 1)]

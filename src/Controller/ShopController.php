@@ -14,13 +14,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use JMS\Serializer\Serializer;
-use JMS\Serializer\SerializationContext;
 
 class ShopController extends AbstractController
 {
@@ -41,10 +40,6 @@ class ShopController extends AbstractController
         SerializerInterface $serializer
     ) :JsonResponse
     {
-        $page = $request->get('page', 1);
-        $limit = $request->get('limit', 5);
-        $limit = $limit > 20 ? 20 : $limit;
-
         $idCache = 'getAllShops';
         $context = SerializationContext::create()->setGroups(["getAllShops"]);
 
@@ -52,13 +47,14 @@ class ShopController extends AbstractController
             echo "MISE EN CACHE";
             $item->tag('ShopCache');
 
-            $shop = $repository->findAll();
-            return $serializer->serialize($shop, 'json', $context);
+            $page = $request->get('page', 1);
+            $limit = $request->get('limit', 5);
+            $limit = min($limit, 20);
 
+            $shop = $repository->findShops($page, $limit);
+            return $serializer->serialize($shop, 'json', $context);
         } );
         return new JsonResponse($jsonShop, 200, [], true);
-
-        // return $this->json($repository->findShops($page, $limit), 200, [], ['groups' => 'getAllShops']);
     }
 
     /**
@@ -103,7 +99,7 @@ class ShopController extends AbstractController
         return new JsonResponse(null, Response::HTTP_OK);
     }
 
-    #[Route('/api/shop', name: '$shop.create', methods: ['POST'])]
+    #[Route('/api/shop', name: 'shop.create', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas admin')]
     public function createShop(
         Request $request,

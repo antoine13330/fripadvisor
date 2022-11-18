@@ -168,7 +168,7 @@ class ProductController extends AbstractController
         return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, [$location => ''], true);
     }
 
-    // method 1 : recherche par filtres
+    // methode 1 : recherche par filtres
     #[Route('/api/product/{sizeProduct}/{priceProduct}', name: 'products.getProductByFiltre', methods: ['GET'])]
     public function getProductByFilters(
         int $sizeProduct,

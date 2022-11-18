@@ -484,6 +484,38 @@ nelmio_api_doc:
                             description: Invalid JSON.
                     security:
                         - Bearer: [ ]
+            /api/product/{sizeProduct}/{priceProduct}:
+                get:
+                    tags:
+                        - Products
+                    summary: First methode - Get a product by size and price.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: int
+                                            name:
+                                                type: string
+                                            price:
+                                                type: string
+                                            size:
+                                                type: string
+                                            stock:
+                                                type: string
+                                            id_shop:
+                                                type: int
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
             /api/pictures/{idPicture}:
                 get:
                     tags:

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CategoryRepository;
+use App\Repository\ProductRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -21,22 +22,6 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *     ),
  *     exclusion = @Hateoas\Exclusion(groups="getAllProducts")
  * )
- */
-
-
-use Hateoas\Configuration\Annotation as Hateoas;
-/**
- * @Hateoas\Relation(
- *      "self",
- *      href=@Hateoas\Route(
- *      "products.getProduct",
- *      parameters={
- *      "idProduct" = "expr(object.getId())"
- *       }
- *      ),
- *      exclusion = @Hateoas\Exclusion(groups="getAllProducts")
- * )
- *
  */
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]

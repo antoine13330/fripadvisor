@@ -484,6 +484,72 @@ nelmio_api_doc:
                             description: Invalid JSON.
                     security:
                         - Bearer: [ ]
+            /api/pictures/{idPicture}:
+                get:
+                    tags:
+                        - Pictures
+                    summary: Get a picture by id.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        realName:
+                                            type: string
+                                        realPath:
+                                            type: string
+                                        publicPath:
+                                            type: string
+                                        mimeType:
+                                            type: string
+                                    type: object
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
+            /api/pictures:
+                post:
+                    tags:
+                        - Pictures
+                    summary: Create a picture.
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    properties:
+                                        id:
+                                            type: int
+                                        realName:
+                                            type: string
+                                        realPath:
+                                            type: string
+                                        publicPath:
+                                            type: string
+                                        mimeType:
+                                            type: string
+                                    type: object
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
 
 
 

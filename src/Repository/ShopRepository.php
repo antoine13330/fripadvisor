@@ -77,4 +77,19 @@ class ShopRepository extends ServiceEntityRepository
             ->setMaxResults($limit);
         return $qb->getQuery()->getResult();
     }
+
+    /**
+     * Retourne les boutiques actives par code postal, paginées par $page à la $limite
+     * @param int $page
+     * @param int $limit limite de boutiques par page
+     * @param string $postalCode code postal
+     */
+    public function findShopsByLocation(int $page, int $limit, string $postalCode) {
+        $qb = $this->createQueryBuilder('s');
+        $qb->where($qb->expr()->eq('s.satus', "1"))
+            ->andWhere($qb->expr()->eq('s.poastalCode', $postalCode))
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+        return $qb->getQuery()->getResult();
+    }
 }

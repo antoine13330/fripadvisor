@@ -107,12 +107,13 @@ class ShopController extends AbstractController
         ValidatorInterface $validator,
     ) :JsonResponse
     {
-       $shop = $serializer->deserialize(
+        $shop = new Shop();
+        $shopInfos = $serializer->deserialize(
             $request->getContent(),
             Shop::class,
             'json');
-        $shop->setName($shop->getName());
-        $shop->setPoastalCode("1");
+        $shop->setName($shopInfos->getName());
+        $shop->setPoastalCode($shopInfos->getPoastalCode());
         $shop->setSatus("1");
 
         $erors = $validator->validate($shop);
@@ -157,4 +158,30 @@ class ShopController extends AbstractController
          $jsonBoutique = $serializer->serialize($shop, 'json', $context);
          return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, [$location => ''], true);
      }
+
+    #[Route('/api/shop/{postalCode}', name: 'shops.getShopByLocation', methods: ['GET'])]
+    #[ParamConverter("shop", options: ["poastalCode" => "postalCode"], class: 'App\Entity\Shop')]
+    public function getShopByLocation(
+        Shop $shop,
+        ShopRepository $repository,
+        Request $request,
+        SerializerInterface $serializer,
+        TagAwareCacheInterface $cache
+    ) :JsonResponse
+    {
+        $idCache = 'getShop';
+        $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request, $shop) {
+            $item->tag("getShop");
+            $context = SerializationContext::create()->setGroups('getShop');
+
+            $page = $request->get('page', 1);
+            $limit = $request->get('limit', 5);
+            $limit = min($limit, 20);
+
+            $shops = $repository->findShopsByLocation($page, $limit, $shop->getPoastalCode());
+            return $serializer->serialize($shops, 'json', $context);
+        });
+
+        return new JsonResponse($jsonShop, Response::HTTP_OK, [], true);
+    }
 }

@@ -103,12 +103,13 @@ class CategoryController extends AbstractController
         ValidatorInterface $validator,
     ) :JsonResponse
     {
-        $category = $serializer->deserialize(
+        $category = new Category();
+        $categoryInfos = $serializer->deserialize(
             $request->getContent(),
             Category::class,
             'json');
-        $category->setName($category->getName());
-        $category->setType($category->getType());
+        $category->setName($categoryInfos->getName());
+        $category->setType($categoryInfos->getType());
         $category->setStatus("1");
 
         $errors = $validator->validate($category);

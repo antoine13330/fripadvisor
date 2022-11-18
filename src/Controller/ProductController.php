@@ -110,17 +110,17 @@ class ProductController extends AbstractController
         ShopRepository $shopRepository
     ) :JsonResponse
     {
-        $product = $serializer->deserialize(
+        $product = new Product();
+        $productInfos = $serializer->deserialize(
             $request->getContent(),
             Product::class,
             'json'
         );
-        $product->setName($product->getName());
-        $product->setPrice($product->getPrice());
-        $product->setSize($product->getSize());
-        $product->setStock($product->getStock());
-        $product->setIdShop($shopRepository->find($product->getIdShop()));
-        $product->setStatus(true);
+        $product->setName($productInfos->getName());
+        $product->setPrice($productInfos->getPrice());
+        $product->setSize($productInfos->getSize());
+        $product->setStock($productInfos->getStock());
+        $product->setStatus("1");
 
         $erors = $validator->validate($product);
         if ($erors->count() >0) {

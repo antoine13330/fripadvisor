@@ -85,7 +85,6 @@ class ProductController extends AbstractController
      * @throws \Psr\Cache\InvalidArgumentException
      */
     #[Route('/api/product/{idProduct}', name: 'products.deleteProduct', methods: ['DELETE'])]
-    #[ParamConverter("Product", options: ["id" => "idProduct"], class: 'App\Entity\Product')]
     #[ParamConverter("product", options: ["id" => "idProduct"], class: 'App\Entity\Product')]
     public function deleteProduct(
         Product $product,
@@ -118,8 +117,7 @@ class ProductController extends AbstractController
 
         $content = $request->toArray();
         $idShop = $content["idShop"];
-        $shop = $shopRepository->find($idShop);
-        $newProduct->setIdShop($shop);
+        $newProduct->setIdShop($shopRepository->find($idShop));
 
         $erors = $validator->validate($newProduct);
         if ($erors->count() >0) {

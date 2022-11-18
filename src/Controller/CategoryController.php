@@ -104,12 +104,12 @@ class CategoryController extends AbstractController
     ) :JsonResponse
     {
         $category = new Category();
-        $categoryInfos = $serializer->deserialize(
+        $newCategory = $serializer->deserialize(
             $request->getContent(),
             Category::class,
             'json');
-        $category->setName($categoryInfos->getName());
-        $category->setType($categoryInfos->getType());
+        $category->setName($newCategory->getName());
+        $category->setType($newCategory->getType());
         $category->setStatus("1");
 
         $errors = $validator->validate($category);
@@ -120,8 +120,10 @@ class CategoryController extends AbstractController
         $entityManager->persist($category);
         $entityManager->flush();
 
+        $context = SerializationContext::create()->setGroups(["getCategory"]);
+
         $location = $urlGenerator->generate("categories.getCategory", ['idCategory' => $category->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
-        $jsonCategory = $serializer->serialize($category, 'json', ['groups' => 'getCategory']);
+        $jsonCategory = $serializer->serialize($category, 'json', $context);
         return new JsonResponse($jsonCategory, Response::HTTP_CREATED, ["Location" => $location], true);
     }
 

@@ -42,7 +42,7 @@ class ShopController extends AbstractController
     {
         $idCache = 'getAllShops';
         $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request) {
-            $item->tag('ShopCache');
+            $item->tag('getShop');
             $context = SerializationContext::create()->setGroups(["getAllShops"]);
 
             $page = $request->get('page', 1);
@@ -108,12 +108,13 @@ class ShopController extends AbstractController
     ) :JsonResponse
     {
         $shop = new Shop();
-        $shopInfos = $serializer->deserialize(
+        $newShop = $serializer->deserialize(
             $request->getContent(),
             Shop::class,
             'json');
-        $shop->setName($shopInfos->getName());
-        $shop->setPoastalCode($shopInfos->getPoastalCode());
+        $shop->setName($newShop->getName());
+        $shop->setPoastalCode($newShop->getName());
+        $shop->setLocation($newShop->getLocation());
         $shop->setSatus("1");
 
         $erors = $validator->validate($shop);

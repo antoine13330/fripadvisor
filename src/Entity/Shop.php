@@ -26,7 +26,6 @@ use Hateoas\Configuration\Annotation as Hateoas;
 class Shop
 {
     #[ORM\Id]
-    #[Assert\NotNull()]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(['getShop', 'getAllShops', 'getProduct', 'getAllProducts'])]

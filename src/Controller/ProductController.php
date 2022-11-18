@@ -111,15 +111,16 @@ class ProductController extends AbstractController
     ) :JsonResponse
     {
         $product = new Product();
-        $productInfos = $serializer->deserialize(
+        $newProduct = $serializer->deserialize(
             $request->getContent(),
             Product::class,
             'json'
         );
-        $product->setName($productInfos->getName());
-        $product->setPrice($productInfos->getPrice());
-        $product->setSize($productInfos->getSize());
-        $product->setStock($productInfos->getStock());
+        $product->setName($newProduct->getName());
+        $product->setPrice($newProduct->getPrice());
+        $product->setSize($newProduct->getSize());
+        $product->setStock($newProduct->getStock());
+        $product->setIdShop($shopRepository->find($newProduct->getIdShop()));
         $product->setStatus("1");
 
         $erors = $validator->validate($product);

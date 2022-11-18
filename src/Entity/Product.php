@@ -2,11 +2,12 @@
 
 namespace App\Entity;
 
-use App\Repository\ProductRepository;
+use App\Repository\CategoryRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
+//use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
 /**
@@ -20,6 +21,22 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *     ),
  *     exclusion = @Hateoas\Exclusion(groups="getAllProducts")
  * )
+ */
+
+
+use Hateoas\Configuration\Annotation as Hateoas;
+/**
+ * @Hateoas\Relation(
+ *      "self",
+ *      href=@Hateoas\Route(
+ *      "products.getProduct",
+ *      parameters={
+ *      "idProduct" = "expr(object.getId())"
+ *       }
+ *      ),
+ *      exclusion = @Hateoas\Exclusion(groups="getAllProducts")
+ * )
+ *
  */
 
 #[ORM\Entity(repositoryClass: ProductRepository::class)]

@@ -105,37 +105,34 @@ class ProductController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
-        UrlGeneratorInterface $urlGenerator,
         ValidatorInterface $validator,
         ShopRepository $shopRepository
     ) :JsonResponse
     {
-        $product = new Product();
         $newProduct = $serializer->deserialize(
             $request->getContent(),
-            Product::class,
-            'json'
-        );
-        $product->setName($newProduct->getName());
-        $product->setPrice($newProduct->getPrice());
-        $product->setSize($newProduct->getSize());
-        $product->setStock($newProduct->getStock());
-        $product->setIdShop($shopRepository->find($newProduct->getIdShop()));
-        $product->setStatus("1");
+            Product::class
+            , 'json');
 
-        $erors = $validator->validate($product);
+        $newProduct->setStatus("1");
+
+        $content = $request->toArray();
+        $idShop = $content["idShop"];
+        $shop = $shopRepository->find($idShop);
+        $newProduct->setIdShop($shop);
+
+        $erors = $validator->validate($newProduct);
         if ($erors->count() >0) {
             return new JsonResponse($serializer->serialize($erors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
         }
 
-        $entityManager->persist($product);
+        $entityManager->persist($newProduct);
         $entityManager->flush();
 
         $context = SerializationContext::create()->setGroups(["getProduct"]);
 
-        $location = $urlGenerator->generate("products.getProduct", ['idProduct' => $product->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
-        $jsonProduct = $serializer->serialize($product, 'json', $context);
-        return new JsonResponse($jsonProduct, Response::HTTP_CREATED, ["Location" => $location], true);
+        $jsonProduct = $serializer->serialize($newProduct, 'json', $context);
+        return new JsonResponse($jsonProduct, Response::HTTP_CREATED, [], true);
     }
 
     // update route
@@ -170,4 +167,21 @@ class ProductController extends AbstractController
         $jsonBoutique = $serializer->serialize($product, 'json', $context);
         return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, [$location => ''], true);
     }
+
+    // method 1 : recherche par filtres
+    #[Route('/api/product/{sizeProduct}/{priceProduct}', name: 'products.getProductByFiltre', methods: ['GET'])]
+    public function getProductByFilters(
+        int $sizeProduct,
+        int $priceProduct,
+        SerializerInterface $serializer,
+        ProductRepository $repository
+    ) :JsonResponse
+    {
+        $context = SerializationContext::create()->setGroups(["getAllProducts"]);
+
+        $res = $repository->findProductByFilter($sizeProduct, $priceProduct);
+        $jsonBoutique = $serializer->serialize($res, 'json', $context);
+        return new JsonResponse($jsonBoutique, Response::HTTP_OK, [], true);
+    }
+
 }

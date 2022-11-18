@@ -15,7 +15,7 @@ use Hateoas\Configuration\Annotation as Hateoas;
  *      href=@Hateoas\Route(
  *      "shops.getShop",
  *      parameters= {
- *          "idShop" = "expr(object.getId())"
+ *      "idShop" = "expr(object.getId())"
  *      }
  *     ),
  *     exclusion = @Hateoas\Exclusion(groups="getAllShops")
@@ -41,7 +41,9 @@ class Shop
     #[Assert\NotNull()]
     #[Assert\NotBlank(message: "Il faut renseigner le code postal")]
     #[ORM\Column(length: 5)]
+    #[Assert\NotBlank(message: "Une boutique doit avoir un code postal")]
     #[Assert\NotNull()]
+    #[Assert\Length(min: 3, minMessage: "Le code postal de la boutique doit faire plus de {{ limit }} caractères")]
     #[Groups(['getShop', 'getAllShops'])]
     private ?string $poastalCode = null;
 

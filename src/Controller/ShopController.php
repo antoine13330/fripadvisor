@@ -103,33 +103,28 @@ class ShopController extends AbstractController
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
-        UrlGeneratorInterface $urlGenerator,
         ValidatorInterface $validator,
     ) :JsonResponse
     {
-        $shop = new Shop();
         $newShop = $serializer->deserialize(
             $request->getContent(),
             Shop::class,
             'json');
-        $shop->setName($newShop->getName());
-        $shop->setPoastalCode($newShop->getName());
-        $shop->setLocation($newShop->getLocation());
-        $shop->setSatus("1");
 
-        $erors = $validator->validate($shop);
-        if ($erors->count() >0) {
-            return new JsonResponse($serializer->serialize($erors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
+        $newShop->setSatus("1");
+
+        $errors = $validator->validate($newShop);
+        if ($errors->count() >0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), JsonResponse::HTTP_BAD_REQUEST, [], true);
         }
 
-        $entityManager->persist($shop);
+        $entityManager->persist($newShop);
         $entityManager->flush();
 
         $context = SerializationContext::create()->setGroups(["getShop"]);
 
-        $location = $urlGenerator->generate("shops.getShop", ['idShop' => $shop->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
-        $jsonShop = $serializer->serialize($shop, 'json', $context);
-        return new JsonResponse($jsonShop, Response::HTTP_CREATED, ["Location" => $location], true);
+        $jsonShop = $serializer->serialize($newShop, 'json', $context);
+        return new JsonResponse($jsonShop, Response::HTTP_CREATED, [], true);
     }
 
      // update route
@@ -159,30 +154,4 @@ class ShopController extends AbstractController
          $jsonBoutique = $serializer->serialize($shop, 'json', $context);
          return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, [$location => ''], true);
      }
-
-    #[Route('/api/shop/{postalCode}', name: 'shops.getShopByLocation', methods: ['GET'])]
-    #[ParamConverter("shop", options: ["poastalCode" => "postalCode"], class: 'App\Entity\Shop')]
-    public function getShopByLocation(
-        Shop $shop,
-        ShopRepository $repository,
-        Request $request,
-        SerializerInterface $serializer,
-        TagAwareCacheInterface $cache
-    ) :JsonResponse
-    {
-        $idCache = 'getShop';
-        $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $request, $shop) {
-            $item->tag("getShop");
-            $context = SerializationContext::create()->setGroups('getShop');
-
-            $page = $request->get('page', 1);
-            $limit = $request->get('limit', 5);
-            $limit = min($limit, 20);
-
-            $shops = $repository->findShopsByLocation($page, $limit, $shop->getPoastalCode());
-            return $serializer->serialize($shops, 'json', $context);
-        });
-
-        return new JsonResponse($jsonShop, Response::HTTP_OK, [], true);
-    }
 }

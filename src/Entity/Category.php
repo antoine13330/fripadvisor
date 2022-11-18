@@ -36,12 +36,16 @@ class Category
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Une categorie doit avoir un nom")]
-    #[Assert\NotNull(message: "Une categorie doit avoir un nom")]
+    #[Assert\NotBlank(message: "Une catégorie doit avoir un nom")]
+    #[Assert\NotNull()]
+    #[Assert\Length(min: 3, minMessage: "Le nom de la catégorie doit faire plus de {{ limit }} lettres")]
     #[Groups(['getCategory', 'getAllCategories'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Une catégorie doit avoir un type")]
+    #[Assert\NotNull()]
+    #[Assert\Length(min: 1, minMessage: "Le type de la catégorie doit faire plus de {{ limit }} lettres")]
     #[Groups(['getCategory', 'getAllCategories'])]
     #[Assert\NotBlank(message: "Une categorie doit avoir un type")]
     #[Assert\NotNull(message: "Une categorie doit avoir un type")]

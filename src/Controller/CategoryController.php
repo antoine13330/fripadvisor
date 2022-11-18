@@ -56,9 +56,8 @@ class CategoryController extends AbstractController
             echo "MISE EN CACHE";
             $item->tag('CategoryCache');
 
-
             $category = $repository->findAll();
-        return $serializer->serialize($category, 'json', $context);
+            return $serializer->serialize($category, 'json', $context);
 
         } );
         return new JsonResponse($jsonCategory, 200, [], true);
@@ -101,47 +100,46 @@ class CategoryController extends AbstractController
         return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
 
-    #[Route('/api/category', name: '$category.create', methods: ['POST'])]
+    // create
+    #[Route('/api/category', name: 'category.create', methods: ['POST'])]
     #[IsGranted('ROLE_ADMIN', message: 'Vous n\'êtes pas admin')]
     public function createCategory(
-        Category $category,
         Request $request,
-        EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
-        UrlGeneratorInterface $urlGenerator,
+        EntityManagerInterface $entityManager,
         ValidatorInterface $validator,
     ) :JsonResponse
     {
-        $updateCategory = $serializer->deserialize(
+        $newCategory = $serializer->deserialize(
             $request->getContent(),
             Category::class,
             'json');
-        $category->setName($updateCategory->getName() ? $updateCategory->getName() : $category->getName());
-        $category->setType($updateCategory->getType() ? $updateCategory->getType() : $category->getType());
-        $category->setStatus("1");
 
-        $errors = $validator->validate($category);
+        $errors = $validator->validate($newCategory);
         if ($errors->count() >0) {
             return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
         }
-
-        $entityManager->persist($category);
+        $newCategory->setStatus("1");
+        $entityManager->persist($newCategory);
         $entityManager->flush();
 
-        $location = $urlGenerator->generate("categories.getCategory", ['idCategory' => $category->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
-        $jsonCategory = $serializer->serialize($category, 'json', ['groups' => 'getCategory']);
-        return new JsonResponse($jsonCategory, Response::HTTP_CREATED, ["Location" => $location], true);
+        $context = SerializationContext::create()->setGroups(["getAllCategories"]);
+
+        //$location = $urlGenerator->generate("categories.getCategory", ['idCategory' => $category->getId(), UrlGeneratorInterface::ABSOLUTE_URL]);
+        $jsonCategory = $serializer->serialize($newCategory, 'json', $context /*['groups' => 'getCategory']*/);
+        return new JsonResponse($jsonCategory, Response::HTTP_CREATED, [], true);
     }
 
     // update route
     #[Route('/api/category/{id}', name: 'Category.update', methods: ['PUT'])]
     // #[ParamConverter("category", options: ["id" => "idCategory"], class: 'App\Entity\Category')]
     public function updateCategory(
-        Category $Category,
+        Category $category,
         Request $request,
         EntityManagerInterface $entityManager,
         SerializerInterface $serializer,
         CategoryRepository $categoryRepository,
+        ValidatorInterface $validator,
         UrlGeneratorInterface $urlGenerator
     ): JsonResponse {
         // $Category = $serializer->deserialize(
@@ -157,22 +155,28 @@ class CategoryController extends AbstractController
             'json'
         );
 
-        $Category->setName($updateCategory->getName() ? $updateCategory->getName() : $Category->getName());
-        $Category->setType($updateCategory->getType() ? $updateCategory->getType() : $Category->getType());
+        $category->setName($updateCategory->getName() ? $updateCategory->getName() : $category->getName());
+        $category->setType($updateCategory->getType() ? $updateCategory->getType() : $category->getType());
+        $category->setStatus("1");
 
-        $Category->setStatus("1");
+        $errors = $validator->validate($category);
+        if ($errors->count() >0) {
+            return new JsonResponse($serializer->serialize($errors, 'json'), Response::HTTP_BAD_REQUEST, [], true);
+        }
+
+        $category->setStatus("1");
 
         $content = $request->toArray();
         $id = $content['idCategory'];
 
-        $entityManager->persist($Category);
+        $entityManager->persist($category);
         $entityManager->flush();
 
-        $location = $urlGenerator->generate("categories.getCategory", ['idCategory' => $Category->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $location = $urlGenerator->generate("categories.getCategory", ['idCategory' => $category->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $context = SerializationContext::create()->setGroups(["getAllCategories"]);
 
-        $jsonBoutique = $serializer->serialize($Category, 'json', $context /*['groups' => 'getAllCategories']*/);
+        $jsonBoutique = $serializer->serialize($category, 'json', $context /*['groups' => 'getAllCategories']*/);
         return new JsonResponse($jsonBoutique, JsonResponse::HTTP_CREATED, ['$location' => ''], true);
     }
 }

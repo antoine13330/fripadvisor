@@ -78,4 +78,13 @@ class ProductRepository extends ServiceEntityRepository
             ->setMaxResults($limit);
         return $qb->getQuery()->getResult();
     }
+
+    public function findProductByFilter(int $size, int $price)
+    {
+        $res = $this->createQueryBuilder('P');
+        $res->where($res->expr()->eq('P.size', $size));
+        $res->andWhere($res->expr()->eq('P.price', $price));
+        return $res->getQuery()->getResult();
+    }
+    
 }

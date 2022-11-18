@@ -8,6 +8,7 @@
 If you didn't already:
  - create a database named ```fripadvisor``` on your mysql server on port 3306 ( or change in DATABASE_URL DB_NAME)
  - configure your DATABASE_URL in .env.local file  where ```mysql://DB_USER@127.0.0.1:3306/DB_NAME?serverVersion=14&charset=utf8mb4```. U can set a passphrase to your db.
+ - load db with ```php bin/console d:s:u```
  - if you want fake datas use in console ```php bin/console doctrine:fixtures:load```
 
 CtrlC/V .env and rename it .env.local.

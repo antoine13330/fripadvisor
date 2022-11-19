@@ -156,7 +156,6 @@ class ShopController extends AbstractController
      }
 
      #[Route('/api/shop/coordinates', name: 'Shop.getByCoo', methods: ['POST'])]
-
      public function findShopByCoordinates(
         Request $request,
         ShopRepository $repository,
@@ -164,10 +163,9 @@ class ShopController extends AbstractController
         TagAwareCacheInterface $cache,
      ) : JsonResponse
      {
-        $cache->invalidateTags(["getShop"]);
         $coordinates= $serializer->deserialize($request->getContent(),Shop::class,'json');
-        $idCache = 'getShopByCoordinate';
-        $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $coordinates) 
+        $idCache = 'getShopByCoordinate'.$coordinates->getLatitude().$coordinates->getLongitude().$coordinates->getRayon();
+        $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $coordinates)
         {
             $item->tag("getShop");
             $context = SerializationContext::create()->setGroups('getShop');

@@ -100,7 +100,7 @@ class ShopRepository extends ServiceEntityRepository
         $query = $this->getEntityManager()->createNativeQuery(
             'SELECT * 
             FROM `shop` 
-            WHERE shop.satus = "1" AND (6378 * acos(cos(radians(:latitude)) * cos(radians(shop.latitude)) * cos(radians(shop.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(shop.latitude)))) <= :rayon
+            WHERE shop.satus = "1"
             ORDER BY (6378 * acos(cos(radians(:latitude)) * cos(radians(shop.latitude)) * cos(radians(shop.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(shop.latitude))))',
             $rsm
         );

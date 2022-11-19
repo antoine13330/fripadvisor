@@ -6,6 +6,7 @@ use App\Entity\Shop;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
+use Doctrine\ORM\Query\ResultSetMappingBuilder;
 
 /**
  * @extends ServiceEntityRepository<Shop>
@@ -91,5 +92,21 @@ class ShopRepository extends ServiceEntityRepository
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
         return $qb->getQuery()->getResult();
+    }
+    public function findShopByCoordinates(float $lat,float $lon,float $rayon)
+    {       
+        $rsm = new ResultSetMappingBuilder($this->getEntityManager());
+        $rsm->addRootEntityFromClassMetadata(Shop::class, 'shop');
+        $query = $this->getEntityManager()->createNativeQuery(
+            'SELECT * 
+            FROM `shop` 
+            WHERE shop.satus = "1" AND (6378 * acos(cos(radians(:latitude)) * cos(radians(shop.latitude)) * cos(radians(shop.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(shop.latitude)))) <= :rayon
+            ORDER BY (6378 * acos(cos(radians(:latitude)) * cos(radians(shop.latitude)) * cos(radians(shop.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(shop.latitude))))',
+            $rsm
+        );
+        $query->setParameter('latitude', $lat);
+        $query->setParameter('longitude', $lon);
+        $query->setParameter('rayon', $rayon);
+        return $query->getResult();
     }
 }

@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Hateoas\Configuration\Annotation as Hateoas;
+use PhpParser\Node\Expr\Cast\Double;
+
 /**
  * @Hateoas\Relation(
  *      "self",
@@ -54,6 +56,23 @@ class Shop
     #[Groups(['getShop', 'getAllShops'])]
     #[ORM\Column(length: 1)]
     private ?string $satus = null;
+
+    #[Groups(['getShop', 'getAllShops'])]
+    #[ORM\Column(length: 255, nullable: false)]
+    #[Assert\NotBlank(message: "Une boutique doit avoir une longitude")]
+    #[Assert\NotNull()]
+    private ?float $longitude = null;
+
+    #[Groups(['getShop', 'getAllShops'])]
+    #[ORM\Column(length: 255, nullable: false)]
+    #[Assert\NotBlank(message: "Une boutique doit avoir une latitude")]
+    #[Assert\NotNull()]
+    private ?float $latitude = null;
+
+
+    #[Groups(['getShop', 'getAllShops'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?float $rayon = null;
 
     #[ORM\OneToMany(mappedBy: 'idShop', targetEntity: Product::class)]
     private Collection $products;
@@ -123,7 +142,39 @@ class Shop
     {
         return $this->products;
     }
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
 
+    public function setLongitude(float $longitude): self
+    {
+        $this->longitude = $longitude;
+
+        return $this;
+    }
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(float $latitude): self
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+    public function getRayon(): ?float
+    {
+        return $this->rayon;
+    }
+
+    public function setRayon(float $rayon): self
+    {
+        $this->rayon = $rayon;
+
+        return $this;
+    }
     public function addProduct(Product $product): self
     {
         if (!$this->products->contains($product)) {

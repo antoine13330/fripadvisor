@@ -85,5 +85,18 @@ class ProductRepository extends ServiceEntityRepository
         $res->andWhere($res->expr()->eq('P.price', $price));
         return $res->getQuery()->getResult();
     }
-    
+    public function findProductBySize(int $size)
+    {
+        $res = $this->createQueryBuilder('P');
+        $res->where($res->expr()->eq('P.size', $size));
+        return $res->getQuery()->getResult();
+    }
+
+
+    public function findProductByPrice(int $price)
+    {
+        $res = $this->createQueryBuilder('P');
+        $res->andWhere($res->expr()->eq('P.price', $price));
+        return $res->getQuery()->getResult();
+    }
 }

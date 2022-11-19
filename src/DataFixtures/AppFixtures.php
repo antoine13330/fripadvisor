@@ -64,6 +64,8 @@ class AppFixtures extends Fixture
             $shop->setName($this->faker->company())
                 ->setPoastalCode($this->faker->streetAddress())
                 ->setLocation($this->faker->streetAddress())
+                ->setLatitude($this->faker->latitude($min = -90, $max = 90))
+                ->setLongitude($this->faker->longitude($min = -180, $max = 180))
                 ->setSatus(true);
 
             $manager->persist($shop);

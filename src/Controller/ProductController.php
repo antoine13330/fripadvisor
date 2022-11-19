@@ -178,6 +178,8 @@ class ProductController extends AbstractController
         $context = SerializationContext::create()->setGroups(["getAllProducts"]);
 
         $res = $repository->findProductByFilter($sizeProduct, $priceProduct);
+        $res += $repository->findProductBySize($sizeProduct);
+        $res += $repository->findProductByPrice($priceProduct);
         $jsonBoutique = $serializer->serialize($res, 'json', $context);
         return new JsonResponse($jsonBoutique, Response::HTTP_OK, [], true);
     }

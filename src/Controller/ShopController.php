@@ -154,4 +154,28 @@ class ShopController extends AbstractController
          $jsonBoutique = $serializer->serialize($shop, 'json', $context);
          return new JsonResponse($jsonBoutique, Response::HTTP_CREATED, [$location => ''], true);
      }
+
+     #[Route('/api/shop/coordinates', name: 'Shop.getByCoo', methods: ['POST'])]
+
+     public function findShopByCoordinates(
+        Request $request,
+        ShopRepository $repository,
+        SerializerInterface $serializer,
+        TagAwareCacheInterface $cache,
+     ) : JsonResponse
+     {
+        $cache->invalidateTags(["getShop"]);
+        $coordinates= $serializer->deserialize($request->getContent(),Shop::class,'json');
+        $idCache = 'getShopByCoordinate';
+        $jsonShop = $cache->get($idCache, function (ItemInterface $item) use ($repository, $serializer, $coordinates) 
+        {
+            $item->tag("getShop");
+            $context = SerializationContext::create()->setGroups('getShop');
+            $shops = $repository->findShopByCoordinates($coordinates->getLatitude(), $coordinates->getLongitude(), $coordinates->getRayon());
+            return $serializer->serialize($shops, 'json', $context);
+         });
+
+        return new JsonResponse($jsonShop, Response::HTTP_OK, [], true);
+     }
+    
 }

@@ -179,6 +179,40 @@ nelmio_api_doc:
                             description: Invalid JSON.
                     security:
                         - Bearer: [ ]
+            /api/shop/coordinates:
+                get:
+                    tags:
+                        - Shops
+                    summary: Second methode - Get all the actives shops by coordinates/radius.
+
+                    responses:
+                        "200":
+                            description: OK
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            id:
+                                                type: int
+                                            name:
+                                                type: string
+                                            poastal_code:
+                                                type: string
+                                            location:
+                                                type: string
+                                            latitude:
+                                                type: float
+                                            longitude:
+                                                type: float
+                                            rayon:
+                                                type: float
+                        "401":
+                            description: Invalid credentials
+                        "400":
+                            description: Invalid JSON.
+                    security:
+                        - Bearer: [ ]
             /api/shop:
                 post:
                     tags:
